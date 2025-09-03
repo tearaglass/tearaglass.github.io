@@ -1,40 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>God's Cruiseline — Prophet Portal</title>
-  <!-- Tailwind CDN (kept) -->
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>God's Cruiseline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <style>
+        /* Y2K Commodore 64 Lisa Frank Dolphin Overload - ENCAPSULATED */
+        :root {
+            --c64-blue: #22181C;
+            --c64-light-blue: #BFD7EA;
+            --c64-bezel: #EAE3D5;
+            --c64-bezel-dark: #C2B8A5;
+            --lisa-pink: #ff77a8;
+            --lisa-yellow: #DBF4A7;
+            --lisa-purple: #7D84B2;
+            --lisa-teal: #5AAA95;
+            --pastel-cyan: #b8f2e6;
+        }
 
-  <style>
-    /* =============================================
-       THEME: Nautical Luxury (soft pink/purple/teal/pale yellow)
-       ============================================= */
+        html, body { height: 100%; margin: 0; padding: 0; }
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+            cursor: url('https://cur.cursors-4u.net/symbols/sym-1/sym46.cur'), auto;
+            image-rendering: pixelated;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-size: cover;
+        }
+        
+        #c64-monitor {
+            width: 95vw;
+            height: 85vh;
+            max-width: 1200px;
+            background: linear-gradient(135deg, var(--c64-bezel), var(--c64-bezel-dark));
+            border: 2px solid #000;
+            border-radius: 20px;
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.7), inset 5px 5px 15px rgba(255,255,255,0.3);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
 
-    :root{
-      --navy: #0e2230;             /* deep nautical */
-      --ocean: #0f3447;            /* dark teal base */
-      --foam: #d9f3f0;             /* pale aqua */
-      --rose: #f6c8d8;             /* soft pink */
-      --lilac: #d9c8f8;            /* lavender */
-      --mint: #bfe9e3;             /* mint/teal */
-      --sun: #fff1b8;              /* pale yellow */
-      --ink: #121417;              /* text dark */
-      --shell: #fffaf5;            /* card base */
-      --gold: #c7a869;             /* trim */
-    }
+        #c64-top-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px 15px 10px;
+        }
 
-    html,body{height:100%;margin:0}
+        #c64-logo {
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #4a3e31;
+        }
+        #c64-logo span {
+             background: linear-gradient(to right, #d40000, #ff8000, #ffff00, #00ff00, #0000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    /* Background: subtle animated ocean gradient */
-    body{
-      font-family: ui-serif, Georgia, "Times New Roman", serif;
-      color: var(--ink);
-      overflow:hidden;
-      background: radial-gradient(1200px 800px at 70% -10%, rgba(255,255,255,0.15), transparent 60%),
-                  radial-gradient(1000px 600px at 20% 120%, rgba(255,255,255,0.08), transparent 60%),
-                  linear-gradient(180deg, #123 0%, #0f2a3a 35%, #0a2230 100%);
+        #power-light {
+            width: 12px;
+            height: 12px;
+            background: #ff0000;
+            border: 1px solid #8B0000;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #ff0000;
+        }
+
+        #monitor-screen {
+            flex-grow: 1;
+            background: var(--c64-blue);
+            border: 2px solid #000;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #screen-border {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: 20px solid var(--c64-light-blue);
+            box-sizing: border-box;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        #desktop {
+            width: 100%; height: 100%;
+            background-size: cover;
+            position: relative;
+            z-index: 2;
+        }
+
+        #desktop::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 3;
+            animation: scanline 10s linear infinite;
+        }
+
+        .draggable {
+            position: absolute;
+            background: var(--c64-light-blue);
+            border: 2px solid #fff;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
+            will-change: transform;
+        }
+
+        .header-drag {
+            padding: 3px 5px;
+            cursor: move;
+            z-index: 10;
+            background: var(--c64-blue);
+            color: #fff;
+            text-align: left;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+        }
+        
+        .header-drag .close-button { background: var(--c64-light-blue); border: 2px solid #fff; padding: 0 5px; cursor: pointer; color: #fff; }
+        .header-drag .close-button:active { transform: scale(0.9); }
+
+        #main-window { 
+            width: 95%; 
+            max-width: 500px; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            z-index: 50; 
+            background: var(--pastel-cyan);
+            max-height: calc(100% - 40px);
+            overflow-y: auto;
+        }
+        
+        .wordart { font-size: 2.5rem; font-weight: bold; text-align: center; color: #fff; text-shadow: 2px 2px 0 var(--lisa-pink), -2px -2px 0 var(--lisa-pink), 2px -2px 0 var(--lisa-pink), -2px 2px 0 var(--lisa-pink), 0 0 20px #000; animation: text-flicker 0.5s infinite; }
+        .content-y2k { background: repeating-linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.2) 10px, rgba(255,255,255,0.2) 20px), var(--pastel-cyan); padding: 1rem; border-top: 2px solid #fff; color: #000; }
+        .link-button { font-size: 1.1rem; color: #000; background: var(--lisa-yellow); border: 2px solid #000; text-decoration: none; box-shadow: 2px 2px 0px #000; padding: 5px 10px; display: block; margin: 5px 0; }
+        .link-button:hover, .link-button:active { background: var(--lisa-pink); }
+        .trail { position: absolute; height: 16px; width: 16px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmNzdhOCIgZD0iTTggMTRsLTEuNDUtMS40NUMyLjQ1IDguNDUgMCA1LjUgMCAzIDAgMS41IDEuNSAwIDMgMGMyLjIgMCA0IDEuOCAzIDMuNWwuNDUgMS4zNUw4IDZsMS41NS0yLjY1TCsxMCAzYzAtMS43IDEuNS0zIDMtM3MxLjUgMS41IDEuNSAzYzAgMi41LTIuNDUgNS40NS02LjU1IDkuNTVMOCAxNHoiLz48L3N2Zz4='); background-size: contain; pointer-events: none; z-index: 9999; }
+        
+        .contact-box { border: 2px solid #000; padding: 10px; background: var(--lisa-teal); margin-top: 1rem; }
+        .box-header { font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #000; margin-bottom: 5px; }
+        #profile-song-player { background: var(--c64-light-blue); color: #fff; padding: 5px; font-family: 'VT323'; border: 2px solid #fff; margin-bottom: 1rem; }
+        #play-pause-button { cursor: pointer; user-select: none; }
+
+        @keyframes scanline { to { background-position: 0 100%; } }
+        @keyframes text-flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+        
+        @media (max-width: 768px) {
+            #c64-monitor { width: 100vw; height: 100vh; border-radius: 0; padding: 10px; }
+            #main-window { width: calc(100% - 30px); max-height: calc(100% - 50px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="click-to-start" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; font-size: 3rem; text-align: center; cursor: pointer; font-family: 'VT323', monospace;">
+        > EEEE
+    </div>
+    
+    <div id="c64-monitor">
+        <div id="c64-top-panel">
+            <div id="c64-logo">GODSCRUISELINE<span>=</span>prophetportal</div>
+            <div id="power-light"></div>
+        </div>
+        <div id="monitor-screen">
+            <div id="screen-border"></div>
+            <div id="desktop">
+                <!-- Draggable Popups will be appended here by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates for popups -->
+    <template id="popup-templates">
+        <div id="main-window" class="draggable">
+            <div class="header-drag"><span>thepod.fun</span><span class="close-button">x</span></div>
+            <div class="content-y2k">
+                <div class="wordart">$EEEE</div>
+                <div id="profile-song-player"><b>now playing</b> GODVOICE - DOLPHIN DANCE <span id="play-pause-button" style="float: right;">▐▐</span></div>
+                
+                <div class="blurb-box" style="background: var(--lisa-teal);">
+                    <p>✴︎✴︎✴︎gods cruiseline is a metaphysical cruiseship housing a multidisciplinary art collective/collapse ready cult, born from years of research and disappointment in false idols. it is a living artwork, a spectacle, and an ARG-ish experiment.</p>
+                </div>
+
+                <div class="contact-box" style="background: var(--lisa-purple);">
+                    <a href="https://pump.fun/YOUR_COIN_ADDRESS" target="_blank" class="link-button">PUMP.FUN</a>
+                    <a href="https://dexscreener.com/solana/YOUR_COIN_ADDRESS" target="_blank" class="link-button">DEXSCREENER</a>
+                    <a href="https://x.com/godscruiseline" target="_blank" class="link-button">X (TWITTER)</a>
+                    <a href="https://t.me/heavenlyshores" target="_blank" class="link-button">TELEGRAM</a>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let zCounter = 100;
+            const desktop = document.getElementById('desktop');
+            const templates = document.getElementById('popup-templates');                  linear-gradient(180deg, #123 0%, #0f2a3a 35%, #0a2230 100%);
       animation: seaPulse 24s ease-in-out infinite alternate;
       cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAvElEQVRYhe2XQQrCMBCEv2S1g2o0m6s3oY9g1J1xWg4m9o8GJ+oL8bH4x2c8Vt0l1J0R2GgEw3k1e5yG6h6gqQWw2g8R3v0V1t0WQwzKkqf3z8mSg4gk0i3gL9r7J8wT5vIYxqs8cQ3wS0q8w7t6b0yV7b8r8lQ7o3H7cQ0o1oQ6hZV1K2Kp3VqS0X3m5bJm1k1b0mYqkq2s3GmJ5l3Nw7J1c+0yM0iYl1b8Jm7mM3Wgq1pQXkQ8m0kS3n0z5wB+Rz8u9wzq9M1u8+o2ZtW2Hc1Qqk8Yb2a7m0g9o7m/7o7t7y9f2Uo2XK3g4w9wC0n6o7o2d4AAAAAElFTkSuQmCC") 12 12, auto; /* starfish cursor */
       -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
