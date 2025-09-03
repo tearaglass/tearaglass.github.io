@@ -1,489 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>God's Cruiseline</title>
-  <!-- unchanged font + libs -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-
-  <style>
-    /* NOTE: replaced palette w/ cruise-core pastels & abyssal backdrop.
-       functionality untouched; only variables changed. */
-    :root{
-      --abyss: #0b1116;          /* deep sea background */
-      --haze:  #eaf3f2;          /* spa seafoam */
-      --shell: #f6efe6;          /* champagne shell */
-      --ink:   #1a2430;          /* graphite text */
-      --ink-soft:#425466;
-
-      --dolphin-pink:#ff76b2;    /* primary accent */
-      --pool-teal:#7de3da;       /* secondary accent */
-      --porthole-gold:#c9b79e;   /* luxe rim */
-
-      /* legacy vars mapped to new tones (safe: rest of CSS still refers) */
-      --c64-blue: var(--abyss);              /* was #352879 */
-      --c64-light-blue: #203140;            /* softened bezel highlight */
-      --c64-bezel: var(--shell);
-      --c64-bezel-dark: #e4dccf;
-
-      --lisa-pink: var(--dolphin-pink);
-      --lisa-yellow: #ffeaa7;               /* softer yellow */
-      --lisa-purple: #e6d7f5;               /* lilac haze */
-      --lisa-teal: var(--pool-teal);
-      --pastel-cyan: var(--haze);
-    }
-
-    /* unchanged box model + font family */
-    html, body { height:100%; margin:0; padding:0; }
-    body{
-      font-family:'VT323', monospace;
-      /* NOTE: swapped flat black for layered ocean gradient */
-      background:
-        radial-gradient(1200px 700px at 60% -10%, #14202b 0%, var(--abyss) 55%, #070b0f 100%),
-        linear-gradient(180deg, #0d141b 0%, #0b1116 100%);
-      color:#fff;
-      overflow:hidden;
-      cursor:url('https://cur.cursors-4u.net/symbols/sym-1/sym46.cur'), auto; /* unchanged */
-      image-rendering:pixelated;
-      display:flex; justify-content:center; align-items:center;
-      background-size:cover;
-    }
-
-    /* monitor frame */
-    #c64-monitor{
-      width:95vw; height:85vh; max-width:1200px;
-      /* NOTE: warmer shell gradient to feel brochure-luxe */
-      background:linear-gradient(135deg, var(--c64-bezel), var(--c64-bezel-dark));
-      border:2px solid rgba(0,0,0,.6);
-      border-radius:22px; /* NOTE: slightly rounder */
-      box-shadow:
-        0 40px 120px rgba(0,0,0,.5),
-        inset 4px 4px 18px rgba(255,255,255,.35);
-      padding:25px;
-      display:flex; flex-direction:column; position:relative;
-    }
-
-    #c64-top-panel{
-      display:flex; justify-content:space-between; align-items:center;
-      padding:0 10px 15px 10px;
-    }
-
-    #c64-logo{
-      /* NOTE: make header read like ship intranet */
-      font-family: 'Special Elite', serif; /* subtle corporate-weird */
-      font-weight:700; font-size:1.15rem; color:#3b3127;
-      letter-spacing:.5px;
-    }
-    #c64-logo span{
-      /* NOTE: refined gradient (less rainbow harsh, more pearlescent) */
-      background:linear-gradient(90deg,#ff7db9,#ffd3e8,#7de3da,#bfe7ff);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    }
-
-    #power-light{
-      /* NOTE: dimmer, glossier power LED */
-      width:12px; height:12px; background:#ff3b3b;
-      border:1px solid #8B0000; border-radius:50%;
-      box-shadow:0 0 8px #ff3b3b;
-    }
-
-    #monitor-screen{
-      flex-grow:1;
-      /* NOTE: from solid to soft vignette ocean glass */
-      background:
-        radial-gradient(800px 500px at 50% 20%, #254050 0%, var(--c64-blue) 70%);
-      border:2px solid #000;
-      box-shadow:inset 0 0 28px rgba(0,0,0,.85);
-      position:relative; overflow:hidden;
-    }
-
-    #screen-border{
-      position:absolute; inset:0;
-      /* NOTE: bezel ring matches pool teal for subtle luxury pop */
-      border:20px solid rgba(125,227,218,.18);
-      box-sizing:border-box; pointer-events:none; z-index:1;
-    }
-
-    #desktop{ width:100%; height:100%; background-size:cover; position:relative; z-index:2; }
-
-    /* NOTE: scanline softened so text is more legible */
-    #desktop::after{
-      content:""; position:absolute; inset:0;
-      background:linear-gradient(rgba(255,255,255,.03) 50%, rgba(0,0,0,.18) 50%);
-      background-size:100% 4px; opacity:.28; pointer-events:none; z-index:3;
-      animation:scanline 10s linear infinite;
-    }
-
-    .draggable{
-      position:absolute;
-      /* NOTE: window body retuned to glassy card */
-      background:rgba(255,255,255,.22);
-      border:1px solid rgba(255,255,255,.55);
-      backdrop-filter: blur(6px) saturate(1.05);
-      box-shadow: 0 10px 28px rgba(0,0,0,.35);
-      will-change:transform;
-      border-radius:14px; /* softer */
-    }
-
-    .header-drag{
-      padding:6px 8px; /* NOTE: a bit taller for luxe feel */
-      cursor:move; z-index:10;
-      background:linear-gradient(180deg,#13232e,#0f1c26);
-      color:#e8f7f5; text-align:left; font-size:1.2rem;
-      display:flex; justify-content:space-between; align-items:center;
-      text-transform:uppercase; letter-spacing:.8px;
-      border-radius:12px 12px 0 0; /* NOTE: rounded header */
-      border-bottom:1px solid rgba(255,255,255,.18);
-    }
-
-    .header-drag .close-button{
-      /* NOTE: made the 'x' a pill, less harsh but same element */
-      background:rgba(255,255,255,.15);
-      border:1px solid rgba(255,255,255,.6);
-      padding:0 8px; cursor:pointer; color:#fff; border-radius:999px;
-    }
-    .header-drag .close-button:active{ transform:scale(.95); }
-
-    #main-window{
-      /* NOTE: width/position unchanged; color is handled by .content below */
-      width:95%; max-width:500px; top:50%; left:50%;
-      transform:translate(-50%,-50%); z-index:50;
-      background:transparent; /* NOTE: use inner panels for color */
-      max-height:calc(100% - 40px); overflow-y:auto;
-    }
-
-    .wordart{
-      /* NOTE: toned down glow; still celebratory but cleaner */
-      font-size:2.3rem; font-weight:bold; text-align:center; color:#ffffff;
-      text-shadow:0 1px 0 rgba(0,0,0,.4), 0 0 16px rgba(255,118,178,.45);
-      animation:text-flicker .6s infinite;
-      letter-spacing:2px;
-    }
-
-    /* NOTE: replaced diagonal stripes w/ spa glass */
-    .content-y2k{
-      background:linear-gradient(180deg, var(--haze), #dff0ee);
-      padding:1rem; border-top:1px solid rgba(255,255,255,.7); color:#0f1a22;
-      border-radius:0 0 14px 14px;
-    }
-
-    .link-button{
-      /* NOTE: buttons restyled as cruise tickets */
-      font-size:1.1rem; color:#0a1016;
-      background:linear-gradient(180deg,#fff5fb,#ffd7ea);
-      border:1px solid rgba(0,0,0,.15);
-      text-decoration:none; box-shadow:0 8px 18px rgba(255,118,178,.25), inset 0 1px 0 rgba(255,255,255,.8);
-      padding:10px 12px; display:block; margin:8px 0; border-radius:10px;
-      font-weight:700; letter-spacing:.4px;
-    }
-    .link-button:hover,.link-button:active{
-      background:linear-gradient(180deg,#d7fbf7,#7de3da); /* NOTE: hover flips to teal */
-    }
-
-    .trail{
-      /* NOTE: trail color matched to dolphin pink (same size, same logic) */
-      position:absolute; height:16px; width:16px;
-      background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmNzZiMiIgZD0iTTggMTRsLTEuNDUtMS40NUMyLjQ1IDguNDUgMCA1LjUgMCAzIDAgMS41IDEuNSAwIDMgMGMyLjIgMCA0IDEuOCAzIDMuNWwuNDUgMS4zNUw4IDZsMS41NS0yLjY1TCsxMCAzYzAtMS43IDEuNS0zIDMtM3MxLjUgMS41IDEuNSAzYzAgMi41LTIuNDUgNS40NS02LjU1IDkuNTVMOCAxNHoiLz48L3N2Zz4=');
-      background-size:contain; pointer-events:none; z-index:9999;
-      filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));
-    }
-
-    .contact-box{
-      /* NOTE: link box softened to lilac w/ border */
-      border:1px solid rgba(0,0,0,.15);
-      padding:10px; background:var(--lisa-purple); margin-top:1rem;
-      border-radius:12px;
-      box-shadow:0 8px 20px rgba(0,0,0,.12);
-    }
-
-    .box-header{
-      /* NOTE: header looks like “deck log” label */
-      font-size:1.4rem; font-weight:bold; border-bottom:1px dashed rgba(0,0,0,.25);
-      margin-bottom:8px; color:var(--ink);
-      letter-spacing:.5px;
-    }
-
-    #profile-song-player{
-      /* NOTE: player restyled to glassy teal strip */
-      background:linear-gradient(180deg, #18424b, #0f2d35);
-      color:#e8ffff; padding:8px; font-family:'VT323';
-      border:1px solid rgba(255,255,255,.45); margin-bottom:1rem; border-radius:10px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
-    }
-    #play-pause-button{ cursor:pointer; user-select:none; }
-
-    /* animations kept; timing tweaked slightly */
-    @keyframes scanline{ to{ background-position:0 100%; } }
-    @keyframes text-flicker{ 0%,100%{opacity:1} 50%{opacity:.86} }
-
-    /* responsive unchanged except minor rounding removal already matches */
-    @media (max-width:768px){
-      #c64-monitor{ width:100vw; height:100vh; border-radius:0; padding:10px; }
-      #main-window{ width:calc(100% - 30px); max-height:calc(100% - 50px); }
-    }
-  </style>
-</head>
-<body>
-  <!-- unchanged overlay; purely copy aesthetic preserved -->
-  <div id="click-to-start" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; font-size: 3rem; text-align: center; cursor: pointer; font-family: 'VT323', monospace;">
-    >LOAD "$EEEE",8,1
-  </div>
-
-  <div id="c64-monitor">
-    <div id="c64-top-panel">
-      <!-- NOTE: label unchanged except visual styling via CSS above -->
-      <div id="c64-logo">$EEEE<span>=</span>godscruiseline</div>
-      <div id="power-light"></div>
-    </div>
-
-    <div id="monitor-screen">
-      <div id="screen-border"></div>
-      <div id="desktop">
-        <!-- Draggable Popups will be appended here by JS -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Templates for popups -->
-  <template id="popup-templates">
-    <div id="main-window" class="draggable">
-      <div class="header-drag">
-        <!-- NOTE: window title text is aesthetic only -->
-        <span>thepod.fun — ship intranet</span>
-        <span class="close-button">x</span>
-      </div>
-
-      <div class="content-y2k">
-        <div class="wordart">$EEEE</div>
-
-        <div id="profile-song-player">
-          <b>SONG:</b> GOD - DOLPHIN DANCE
-          <span id="play-pause-button" style="float:right;">▐▐</span>
-        </div>
-
-        <!-- NOTE: copy untouched except spacing; background now handled by parent,
-             so I removed inline teal bg to keep palette consistent -->
-        <div class="blurb-box" style="background: linear-gradient(180deg,#fff,#f6f6ff); border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.75rem; box-shadow:0 6px 18px rgba(0,0,0,.08);">
-          <p>!!!!!i want to be an $EEEE icon!!!!! i want $EEEE to finally dissolve my bones into pure liquidity & light!!!! i want to love so hard my frozen marg melts into the blockchain!!!!!!!</p>
-          <p>god’s cruiseline is a metaphysical cruiseship housing a multidisciplinary art collective / collapse-ready cult, born from years of research and disappointment in false idols. it is a living artwork, a performance, and an ARG community ritual.</p>
-          <p>$EEEE is not bullish. bullish is $EEEE. if you can’t hear the sonar, you were never meant to board.</p>
-        </div>
-
-        <div class="contact-box">
-          <p class="box-header">PASSENGER LINKS</p>
-          <!-- NOTE: button labels are aesthetic; hrefs untouched -->
-          <a href="https://pump.fun/YOUR_COIN_ADDRESS" target="_blank" class="link-button">Board Now (pump.fun)</a>
-          <a href="https://dexscreener.com/solana/YOUR_COIN_ADDRESS" target="_blank" class="link-button">View the Tides (Dexscreener)</a>
-          <a href="https://x.com/godscruiseline" target="_blank" class="link-button">Ship Log (X/Twitter)</a>
-          <a href="https://t.me/heavenlyshores" target="_blank" class="link-button">Boarding Gate (Telegram)</a>
-        </div>
-      </div>
-    </div>
-  </template>
-
-  <!-- JS: completely unchanged except -nothing- about behavior was modified -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      let zCounter = 100;
-      const desktop = document.getElementById('desktop');
-      const templates = document.getElementById('popup-templates');
-
-      // Clone templates into the desktop
-      Array.from(templates.content.children).forEach(node => {
-        desktop.appendChild(node.cloneNode(true));
-      });
-
-      const popups = Array.from(desktop.querySelectorAll('.draggable'));
-      let clickSynth, hoverSynth, backgroundSynth, backgroundPattern;
-
-      const makeDraggable = (elmnt) => {
-        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-        const header = elmnt.querySelector(".header-drag");
-        if (!header) return;
-
-        const bringToFront = () => { elmnt.style.zIndex = zCounter++; };
-        header.onmousedown = dragMouseDown;
-        elmnt.onmousedown = bringToFront;
-
-        function dragMouseDown(e) { e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; }
-        function elementDrag(e) {
-          e.preventDefault();
-          pos1 = pos3 - e.clientX;
-          pos2 = pos4 - e.clientY;
-          pos3 = e.clientX;
-          pos4 = e.clientY;
-
-          const newTop = elmnt.offsetTop - pos2;
-          const newLeft = elmnt.offsetLeft - pos1;
-
-          const parentRect = desktop.getBoundingClientRect();
-          const elmntRect = elmnt.getBoundingClientRect();
-
-          if (newTop >= 0 && (newTop + elmntRect.height) <= parentRect.height) {
-            elmnt.style.top = newTop + "px";
-          }
-          if (newLeft >= 0 && (newLeft + elmntRect.width) <= parentRect.width) {
-            elmnt.style.left = newLeft + "px";
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>~$~ ECCO'S RAINBOW DREAM ~$~</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <style>
+        /* Y2K Commodore 64 Lisa Frank Dolphin Overload - ENCAPSULATED */
+        :root {
+            --c64-blue: #352879;
+            --c64-light-blue: #6c5eb5;
+            --c64-bezel: #EAE3D5;
+            --c64-bezel-dark: #C2B8A5;
+            --lisa-pink: #ff77a8;
+            --lisa-yellow: #fdfd96;
+            --lisa-purple: #c8a2c8;
+            --lisa-teal: #77dd77;
+            --pastel-cyan: #b8f2e6;
         }
-        function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
-      };
 
-      const dots = [];
-      for (let i = 0; i < 15; i++) { const dot = document.createElement("div"); dot.className = "trail"; document.body.appendChild(dot); dots.push(dot); }
-      window.addEventListener("mousemove", (event) => { dots.forEach((dot, index) => { setTimeout(() => { dot.style.left = event.pageX + "px"; dot.style.top = event.pageY + "px"; }, index * 25); }); });
-
-      popups.forEach(popup => {
-        const closeBtn = popup.querySelector('.close-button');
-        if (closeBtn) closeBtn.onclick = (e) => {
-          e.stopPropagation();
-          // popup.style.display = 'none'; // Functionality intentionally disabled (aesthetic-only), left as-is.
-        };
-      });
-
-      const startButton = document.getElementById('click-to-start');
-      startButton.addEventListener('click', () => {
-        startButton.style.display = 'none';
-        Tone.start();
-
-        clickSynth = new Tone.MembraneSynth().toDestination();
-        hoverSynth = new Tone.PluckSynth().toDestination();
-        hoverSynth.volume.value = -12;
-        backgroundSynth = new Tone.FMSynth().toDestination();
-        backgroundPattern = new Tone.Pattern((time, note) => { backgroundSynth.triggerAttackRelease(note, 0.1, time); }, ["C2", "G2", "Eb3", "G3", "C4"], "randomWalk").start(0);
-        backgroundPattern.interval = "8n";
-        Tone.Transport.start();
-
-        popups.forEach(makeDraggable);
-
-        document.querySelectorAll('.link-button').forEach(el => {
-          el.addEventListener('mouseenter', () => { if (Tone.context.state === 'running') hoverSynth.triggerAttackRelease('C5', '16n'); });
-        });
-
-        document.body.addEventListener('mousedown', () => { if (Tone.context.state === 'running') clickSynth.triggerAttackRelease("C1", "8n"); });
-
-        const playPauseButton = document.getElementById('play-pause-button');
-        playPauseButton.addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (Tone.Transport.state === 'started') { Tone.Transport.pause(); playPauseButton.textContent = ' ► '; }
-          else { Tone.Transport.start(); playPauseButton.textContent = '▐▐'; }
-        });
-
-      }, { once: true });
-    });
-  </script>
-</body>
-</html>
-    // clone templates immediately so UI exists even before click
-    if (templates && desktop) {
-      Array.from(templates.content.children).forEach(node => desktop.appendChild(node.cloneNode(true)));
-    }
-
-    const popups = Array.from(desktop.querySelectorAll('.draggable'));
-
-    const makeDraggable = (elmnt) => {
-      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-      const header = elmnt.querySelector('.header-drag'); if (!header) return;
-      const bringToFront = () => { elmnt.style.zIndex = zCounter++; };
-      header.onmousedown = dragMouseDown; elmnt.onmousedown = bringToFront;
-      function dragMouseDown(e){ e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; }
-      function elementDrag(e){ e.preventDefault(); pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY; const newTop = elmnt.offsetTop - pos2; const newLeft = elmnt.offsetLeft - pos1; const parentRect = desktop.getBoundingClientRect(); const r = elmnt.getBoundingClientRect(); if (newTop >= 0 && (newTop + r.height) <= parentRect.height) elmnt.style.top = newTop + 'px'; if (newLeft >= 0 && (newLeft + r.width) <= parentRect.width) elmnt.style.left = newLeft + 'px'; }
-      function closeDragElement(){ document.onmouseup = null; document.onmousemove = null; }
-    };
-
-    // sparkle trail (unchanged)
-    const dots = []; for (let i=0;i<15;i++){ const d=document.createElement('div'); d.className='trail'; document.body.appendChild(d); dots.push(d); }
-    window.addEventListener('mousemove', (event) => { dots.forEach((dot, i) => { setTimeout(() => { dot.style.left = event.pageX + 'px'; dot.style.top = event.pageY + 'px'; }, i * 25); }); });
-
-    popups.forEach(p => { const c = p.querySelector('.close-button'); if (c) c.onclick = (e) => { e.stopPropagation(); /* visual-only */ }; });
-
-    const bootUI = () => { popups.forEach(makeDraggable); };
-
-    const startButton = document.getElementById('click-to-start');
-    const safeStart = () => {
-      // always hide overlay so UI is usable even if audio fails
-      if (startButton) startButton.style.display = 'none';
-
-      // try audio init; if Tone missing or blocked, continue silently
-      try {
-        if (window.Tone) {
-          Tone.start();
-          const clickSynth = new Tone.MembraneSynth().toDestination();
-          const hoverSynth = new Tone.PluckSynth().toDestination();
-          hoverSynth.volume.value = -12;
-          const backgroundSynth = new Tone.FMSynth().toDestination();
-          const pattern = new Tone.Pattern((time, note) => { backgroundSynth.triggerAttackRelease(note, 0.1, time); }, ['C2','G2','Eb3','G3','C4'], 'randomWalk').start(0);
-          pattern.interval = '8n';
-          Tone.Transport.start();
-          document.querySelectorAll('.link-button').forEach(el => el.addEventListener('mouseenter', () => { if (Tone.context.state === 'running') hoverSynth.triggerAttackRelease('C5','16n'); }));
-          document.body.addEventListener('mousedown', () => { if (Tone.context.state === 'running') clickSynth.triggerAttackRelease('C1','8n'); });
-          const playPauseButton = document.getElementById('play-pause-button');
-          if (playPauseButton) playPauseButton.addEventListener('click', (e) => { e.stopPropagation(); if (Tone.Transport.state === 'started'){ Tone.Transport.pause(); playPauseButton.textContent = ' ► '; } else { Tone.Transport.start(); playPauseButton.textContent = '▐▐'; } });
-        }
-      } catch (err) { /* silent fail; UI still loads */ }
-
-      bootUI();
-    };
-
-    if (startButton) startButton.addEventListener('click', safeStart, { once:true });
-  });
-</script>
-  
-  <!-- SAFER BOOT SCRIPT appended: opens even if Tone fails -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const desktop = document.getElementById('desktop');
-      const templates = document.getElementById('popup-templates');
-      if (templates && desktop && desktop.children.length === 0) {
-        Array.from(templates.content.children).forEach(n => desktop.appendChild(n.cloneNode(true)));
-      }
-
-      let zCounter = 100;
-      const popups = Array.from(document.querySelectorAll('.draggable'));
-      const makeDraggable = (elmnt) => {
-        let pos1=0,pos2=0,pos3=0,pos4=0; const h=elmnt.querySelector('.header-drag'); if(!h) return;
-        const bringToFront=()=>{ elmnt.style.zIndex = zCounter++; };
-        h.onmousedown=dragMouseDown; elmnt.onmousedown=bringToFront;
-        function dragMouseDown(e){ e.preventDefault(); pos3=e.clientX; pos4=e.clientY; document.onmouseup=closeDragElement; document.onmousemove=elementDrag; }
-        function elementDrag(e){ e.preventDefault(); pos1=pos3-e.clientX; pos2=pos4-e.clientY; pos3=e.clientX; pos4=e.clientY; const nt=elmnt.offsetTop-pos2; const nl=elmnt.offsetLeft-pos1; const pr=desktop.getBoundingClientRect(); const r=elmnt.getBoundingClientRect(); if(nt>=0 && nt+r.height<=pr.height) elmnt.style.top=nt+'px'; if(nl>=0 && nl+r.width<=pr.width) elmnt.style.left=nl+'px'; }
-        function closeDragElement(){ document.onmouseup=null; document.onmousemove=null; }
-      };
-
-      // sparkle trail (unchanged)
-      const dots=[]; for(let i=0;i<15;i++){ const d=document.createElement('div'); d.className='trail'; document.body.appendChild(d); dots.push(d); }
-      window.addEventListener('mousemove', (ev)=>{ dots.forEach((dot,i)=>{ setTimeout(()=>{ dot.style.left=ev.pageX+'px'; dot.style.top=ev.pageY+'px'; }, i*25); }); });
-
-      popups.forEach(p=>{ const c=p.querySelector('.close-button'); if(c) c.onclick=(e)=>{ e.stopPropagation(); }; });
-
-      const startButton=document.getElementById('click-to-start');
-      const safeStart=()=>{
-        if(startButton) startButton.style.display='none';
-        // try audio; ignore failures
-        try{
-          if(window.Tone){
-            Tone.start();
-            const clickSynth=new Tone.MembraneSynth().toDestination();
-            const hoverSynth=new Tone.PluckSynth().toDestination(); hoverSynth.volume.value=-12;
-            const backgroundSynth=new Tone.FMSynth().toDestination();
-            const pattern=new Tone.Pattern((t,n)=>{ backgroundSynth.triggerAttackRelease(n,0.1,t); }, ['C2','G2','Eb3','G3','C4'],'randomWalk').start(0);
-            pattern.interval='8n'; Tone.Transport.start();
-            document.querySelectorAll('.link-button').forEach(el=>el.addEventListener('mouseenter',()=>{ if(Tone.context.state==='running') hoverSynth.triggerAttackRelease('C5','16n'); }));
-            document.body.addEventListener('mousedown',()=>{ if(Tone.context.state==='running') clickSynth.triggerAttackRelease('C1','8n'); });
-            const pp=document.getElementById('play-pause-button'); if(pp) pp.addEventListener('click',(e)=>{ e.stopPropagation(); if(Tone.Transport.state==='started'){ Tone.Transport.pause(); pp.textContent=' ► '; } else { Tone.Transport.start(); pp.textContent='▐▐'; } });
-          }
-        }catch(_){/* silent */}
-        popups.forEach(makeDraggable);
-      };
-      if(startButton) startButton.addEventListener('click', safeStart, {once:true});
-    });
-  </script>
-</body>
-</html>            background-size: cover;
+        html, body { height: 100%; margin: 0; padding: 0; }
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+            cursor: url('https://cur.cursors-4u.net/symbols/sym-1/sym46.cur'), auto;
+            image-rendering: pixelated;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('https://media.giphy.com/media/uVPw401I6gA92/giphy.gif');
+            background-size: cover;
         }
         
         #c64-monitor {
@@ -549,6 +101,7 @@
         
         #desktop {
             width: 100%; height: 100%;
+            background: var(--c64-blue) url('https://media.giphy.com/media/uVPw401I6gA92/giphy.gif');
             background-size: cover;
             position: relative;
             z-index: 2;
@@ -626,12 +179,12 @@
 </head>
 <body>
     <div id="click-to-start" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; font-size: 3rem; text-align: center; cursor: pointer; font-family: 'VT323', monospace;">
-        > EEEE
+        LOAD "$EEEE",8,1
     </div>
     
     <div id="c64-monitor">
         <div id="c64-top-panel">
-            <div id="c64-logo">GODSCRUISELINE<span>=</span>prophetportal</div>
+            <div id="c64-logo">$EEEE<span>=</span> godscruiseline</div>
             <div id="power-light"></div>
         </div>
         <div id="monitor-screen">
@@ -645,20 +198,22 @@
     <!-- Templates for popups -->
     <template id="popup-templates">
         <div id="main-window" class="draggable">
-            <div class="header-drag"><span>thepod.fun</span><span class="close-button">x</span></div>
+            <div class="header-drag"><span>!! WELCOME ABOARD !!</span><span class="close-button">x</span></div>
             <div class="content-y2k">
                 <div class="wordart">$EEEE</div>
-                <div id="profile-song-player"><b>now playing</b> GODVOICE - DOLPHIN DANCE <span id="play-pause-button" style="float: right;">▐▐</span></div>
+                <div id="profile-song-player"><b>SONG:</b> ECCO'S DREAM - COSMIC HUM <span id="play-pause-button" style="float: right;">▐▐</span></div>
                 
                 <div class="blurb-box" style="background: var(--lisa-teal);">
-                    <p>✴︎✴︎✴︎gods cruiseline is a metaphysical cruiseship housing a multidisciplinary art collective/collapse ready cult, born from years of research and disappointment in false idols. it is a living artwork, a spectacle, and an ARG-ish experiment.</p>
+                    <p class="box-header">ABOUT ME:</p>
+                    <p>$EEEE is not bullish. bullish is $EEEE. every candle is a fin, every wick a tail slap. if you can’t hear the sonar you were never meant to board.</p>
                 </div>
 
                 <div class="contact-box" style="background: var(--lisa-purple);">
+                    <p class="box-header">LINKS</p>
                     <a href="https://pump.fun/YOUR_COIN_ADDRESS" target="_blank" class="link-button">PUMP.FUN</a>
                     <a href="https://dexscreener.com/solana/YOUR_COIN_ADDRESS" target="_blank" class="link-button">DEXSCREENER</a>
-                    <a href="https://x.com/godscruiseline" target="_blank" class="link-button">X (TWITTER)</a>
-                    <a href="https://t.me/heavenlyshores" target="_blank" class="link-button">TELEGRAM</a>
+                    <a href="https://x.com/YourXAccount" target="_blank" class="link-button">X (TWITTER)</a>
+                    <a href="https://t.me/YourTelegram" target="_blank" class="link-button">TELEGRAM</a>
                 </div>
             </div>
         </div>
@@ -668,248 +223,91 @@
         document.addEventListener('DOMContentLoaded', () => {
             let zCounter = 100;
             const desktop = document.getElementById('desktop');
-            const templates = document.getElementById('popup-templates');                  linear-gradient(180deg, #123 0%, #0f2a3a 35%, #0a2230 100%);
-      animation: seaPulse 24s ease-in-out infinite alternate;
-      cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAvElEQVRYhe2XQQrCMBCEv2S1g2o0m6s3oY9g1J1xWg4m9o8GJ+oL8bH4x2c8Vt0l1J0R2GgEw3k1e5yG6h6gqQWw2g8R3v0V1t0WQwzKkqf3z8mSg4gk0i3gL9r7J8wT5vIYxqs8cQ3wS0q8w7t6b0yV7b8r8lQ7o3H7cQ0o1oQ6hZV1K2Kp3VqS0X3m5bJm1k1b0mYqkq2s3GmJ5l3Nw7J1c+0yM0iYl1b8Jm7mM3Wgq1pQXkQ8m0kS3n0z5wB+Rz8u9wzq9M1u8+o2ZtW2Hc1Qqk8Yb2a7m0g9o7m/7o7t7y9f2Uo2XK3g4w9wC0n6o7o2d4AAAAAElFTkSuQmCC") 12 12, auto; /* starfish cursor */
-      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-    }
+            const templates = document.getElementById('popup-templates');
+            
+            // Clone templates into the desktop
+            Array.from(templates.content.children).forEach(node => {
+                desktop.appendChild(node.cloneNode(true));
+            });
 
-    @keyframes seaPulse{from{filter:hue-rotate(0deg)}to{filter:hue-rotate(-6deg)}}
+            const popups = Array.from(desktop.querySelectorAll('.draggable'));
+            let clickSynth, hoverSynth, backgroundSynth, backgroundPattern;
 
-    /* Swipe-to-unlock gate */
-    #gate{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(12,28,40,.9),rgba(8,18,26,.95));user-select:none}
-    .gate-track{position:relative;width:min(520px,86vw);height:56px;border-radius:999px;padding:4px;background:rgba(255,255,255,.08);box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 0 2px rgba(255,255,255,.06) inset}
-    .gate-track::before{content:"";position:absolute;inset:0;border-radius:999px;border:1px solid rgba(255,255,255,.22);pointer-events:none}
-    .gate-hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#e9f3ff;letter-spacing:.06em;opacity:.85;font-weight:600}
-    .gate-knob{position:absolute;left:4px;top:4px;width:48px;height:48px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#ffffff,#f2f2f2);border:1px solid rgba(0,0,0,.08);box-shadow:0 6px 18px rgba(0,0,0,.3);font-size:20px;cursor:grab;user-select:none}
-    .gate-knob:active{cursor:grabbing}
-    .gate-success{animation:gateFlash .6s ease forwards}
-    @keyframes gateFlash{from{box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 0 2px rgba(255,255,255,.06) inset}to{box-shadow:0 0 0 2px rgba(255,255,255,.25) inset,0 0 60px rgba(199,168,105,.45)}}
+            const makeDraggable = (elmnt) => {
+                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                const header = elmnt.querySelector(".header-drag");
+                if (!header) return;
 
-    /* Frame */
-    .frame{width:min(96vw,1280px);height:min(88vh,760px);border-radius:24px;margin:auto;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));overflow:hidden}
-    .frame::before{content:"";position:absolute;inset:16px;border-radius:20px;border:2px solid rgba(199,168,105,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 0 30px rgba(199,168,105,.15);pointer-events:none}
+                const bringToFront = () => { elmnt.style.zIndex = zCounter++; };
+                header.onmousedown = dragMouseDown;
+                elmnt.onmousedown = bringToFront;
 
-    /* Screen area */
-    #deck{position:absolute;inset:24px;border-radius:16px;overflow:hidden;background:radial-gradient(800px 280px at 50% 0%,rgba(255,255,255,.12),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.05),transparent 30%),linear-gradient(180deg,#0e2331,#0c1f2b 60%,#0a1b25)}
+                function dragMouseDown(e) { e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; }
+                function elementDrag(e) {
+                    e.preventDefault();
+                    pos1 = pos3 - e.clientX;
+                    pos2 = pos4 - e.clientY;
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    
+                    const newTop = elmnt.offsetTop - pos2;
+                    const newLeft = elmnt.offsetLeft - pos1;
 
-    .sheen{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:.25;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.05) 0 2px,transparent 2px 6px);animation:drift 18s linear infinite}
-    @keyframes drift{from{background-position:0 0}to{background-position:0 100%}}
+                    const parentRect = desktop.getBoundingClientRect();
+                    const elmntRect = elmnt.getBoundingClientRect();
+                    
+                    if (newTop >= 0 && (newTop + elmntRect.height) <= parentRect.height) {
+                        elmnt.style.top = newTop + "px";
+                    }
+                    if (newLeft >= 0 && (newLeft + elmntRect.width) <= parentRect.width) {
+                        elmnt.style.left = newLeft + "px";
+                    }
+                }
+                function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
+            };
 
-    /* Draggable window */
-    .draggable{position:absolute;background:var(--shell);border:1px solid rgba(12,20,28,.25);box-shadow:0 12px 30px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.6) inset;border-radius:14px;overflow:hidden}
-    .header-drag{padding:.6rem .9rem;cursor:move;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,#fbfbfb,#f1f1f1);border-bottom:1px solid rgba(0,0,0,.06);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;font-size:.95rem;letter-spacing:.02em}
-    .title{display:flex;align-items:center;gap:.5rem}
-    .title .badge{font-size:.7rem;padding:.15rem .5rem;border-radius:999px;color:#0a1b25;background:linear-gradient(90deg,var(--rose),var(--lilac),var(--mint));border:1px solid rgba(0,0,0,.08)}
-    .close-button{border:1px solid rgba(0,0,0,.1);background:#fff;color:#111;padding:.1rem .45rem;border-radius:6px;cursor:pointer}
-    .close-button:active{transform:scale(.96)}
+            const dots = [];
+            for (let i = 0; i < 15; i++) { const dot = document.createElement("div"); dot.className = "trail"; document.body.appendChild(dot); dots.push(dot); }
+            window.addEventListener("mousemove", (event) => { dots.forEach((dot, index) => { setTimeout(() => { dot.style.left = event.pageX + "px"; dot.style.top = event.pageY + "px"; }, index * 25); }); });
+            
+            popups.forEach(popup => {
+                const closeBtn = popup.querySelector('.close-button');
+                if(closeBtn) closeBtn.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    // popup.style.display = 'none'; // Functionality removed for aesthetic purposes
+                };
+            });
 
-    .content{padding:1rem;background:linear-gradient(180deg,#fff,#fff8f2)}
-    .brand{font-family:ui-serif,Georgia,"Times New Roman",serif;font-weight:700;font-size:clamp(1.8rem,4vw,2.6rem);text-align:center;background:linear-gradient(90deg,#111,#333);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.25rem}
-    .subtitle{text-align:center;font-size:.95rem;color:#334;opacity:.9;margin-bottom:.9rem}
+            const startButton = document.getElementById('click-to-start');
+            startButton.addEventListener('click', () => {
+                startButton.style.display = 'none';
+                Tone.start();
 
-    .links{display:grid;gap:.5rem}
-    .link-button{display:block;text-align:center;padding:.6rem .8rem;border-radius:10px;border:1px solid rgba(0,0,0,.08);background:linear-gradient(180deg,#ffffff,#f7f7f7);font-weight:600;letter-spacing:.02em;color:#0b1a24;text-decoration:none;transition:transform .08s ease,box-shadow .08s ease}
-    .link-button:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,.12)}
+                clickSynth = new Tone.MembraneSynth().toDestination();
+                hoverSynth = new Tone.PluckSynth().toDestination();
+                hoverSynth.volume.value = -12;
+                backgroundSynth = new Tone.FMSynth().toDestination();
+                backgroundPattern = new Tone.Pattern((time, note) => { backgroundSynth.triggerAttackRelease(note, 0.1, time); }, ["C2", "G2", "Eb3", "G3", "C4"], "randomWalk").start(0);
+                backgroundPattern.interval = "8n";
+                Tone.Transport.start();
 
-    /* Heart trail (kept) */
-    .trail{position:fixed;height:16px;width:16px;pointer-events:none;z-index:9999;background-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNy44OTUgMTMuNzQzQzMuMTYgOS41NTggMCA2LjcyNSAwIDQuMzQzIDAgMi45MTggMS4xOCAxLjc0IDIuNTc3IDEuNzQgMy41NzkgMS43NCA0LjM1NiAyLjMyNyA0LjczNCAzLjE1NUM1LjE2NiAyLjMyNyA1Ljk0MyAxLjc0IDYuOTQ1IDEuNzQgOC4zNDIgMS43NCA5LjUxOSAyLjkxOCA5LjUxOSA0LjM0M2MwIDIuMzgyLTMuMTYgNS4yMTUtNy44OTQgOS40Ljd6IiBmaWxsPSIjZTZ2Ii8+PC9zdmc+');background-size:contain}
+                popups.forEach(makeDraggable);
+                
+                document.querySelectorAll('.link-button').forEach(el => {
+                    el.addEventListener('mouseenter', () => { if(Tone.context.state === 'running') hoverSynth.triggerAttackRelease('C5', '16n'); });
+                });
+                
+                document.body.addEventListener('mousedown', () => { if(Tone.context.state === 'running') clickSynth.triggerAttackRelease("C1", "8n"); });
+                
+                const playPauseButton = document.getElementById('play-pause-button');
+                playPauseButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (Tone.Transport.state === 'started') { Tone.Transport.pause(); playPauseButton.textContent = ' ► '; } 
+                    else { Tone.Transport.start(); playPauseButton.textContent = '▐▐'; }
+                });
 
-    @media (max-width: 768px){ .frame{ width:100vw; height:100vh; border-radius:0 } }
-  </style>
-</head>
-<body>
-  <!-- Swipe to unlock gate -->
-  <div id="gate">
-    <div class="gate-track" id="gate-track">
-      <div class="gate-hint" id="gate-hint">Swipe to board</div>
-      <div class="gate-knob" id="gate-knob">➤</div>
-    </div>
-  </div>
-
-  <!-- Main framed area -->
-  <div class="frame">
-    <div id="deck">
-      <div class="sheen"></div>
-      <!-- Draggable window will be appended here by JS -->
-    </div>
-  </div>
-
-  <!-- Template for popup -->
-  <template id="popup-template">
-    <div id="main-window" class="draggable" style="width:min(520px,92%);left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;">
-      <div class="header-drag">
-        <div class="title">
-          <span>prophetportal</span>
-          <span class="badge">GOD'S CRUISELINE</span>
-        </div>
-        <button class="close-button" title="Close">×</button>
-      </div>
-      <div class="content">
-        <div class="brand">$EEEE — Heavenly Shores</div>
-        <div class="subtitle">metaphysical cruiseship • living artwork • ARG-ish experiment</div>
-        <p class="mb-3 text-[0.98rem] leading-6 text-slate-800">
-          Gods Cruiseline is a multidisciplinary art collective and collapse‑ready cult. yess bro it's literally a streamer coin ... just with more drip and a girl for a host ... problem ??
-        </p>
-        <div class="links">
-          <a class="link-button" target="_blank" href="https://pump.fun/YOUR_COIN_ADDRESS">PUMP.FUN</a>
-          <a class="link-button" target="_blank" href="https://dexscreener.com/solana/YOUR_COIN_ADDRESS">DEXSCREENER</a>
-          <a class="link-button" target="_blank" href="https://x.com/godscruiseline">X (Twitter)</a>
-          <a class="link-button" target="_blank" href="https://t.me/heavenlyshores">Telegram</a>
-        </div>
-      </div>
-    </div>
-  </template>
-
-  <script>
-    // ==============================
-    // CORE JS
-    // ==============================
-
-    let zCounter = 100;
-    const deck = document.getElementById('deck');
-
-    // Swipe-to-unlock gate
-    const track = document.getElementById('gate-track');
-    const knob  = document.getElementById('gate-knob');
-    const hint  = document.getElementById('gate-hint');
-    const gate  = document.getElementById('gate');
-    let dragging=false, startX=0, startLeft=4, maxLeft=0;
-
-    function setBounds(){
-      maxLeft = track.clientWidth - knob.offsetWidth - 8; // 4px padding each side
-    }
-    window.addEventListener('resize', setBounds, {passive:true});
-    setTimeout(setBounds, 0);
-
-    function onStart(e){
-      dragging = true; const p = pointer(e); startX = p.x; startLeft = parseFloat(knob.style.left||'4');
-      window.addEventListener('mousemove', onMove); window.addEventListener('touchmove', onMove, {passive:false});
-      window.addEventListener('mouseup', onEnd);   window.addEventListener('touchend', onEnd);
-    }
-    function onMove(e){ if(!dragging) return; e.preventDefault(); const p = pointer(e);
-      const dx = p.x - startX; let left = Math.min(maxLeft, Math.max(4, startLeft + dx));
-      knob.style.left = left + 'px';
-      const pct = (left-4) / (maxLeft);
-      hint.style.opacity = String(0.85 * (1 - pct*0.95));
-    }
-    function onEnd(){ if(!dragging) return; dragging=false; const left = parseFloat(knob.style.left||'4');
-      if(left >= maxLeft - 2){ unlock(); } else { knob.style.left = '4px'; hint.style.opacity = '0.85'; }
-      window.removeEventListener('mousemove', onMove); window.removeEventListener('touchmove', onMove);
-      window.removeEventListener('mouseup', onEnd); window.removeEventListener('touchend', onEnd);
-    }
-    function pointer(e){ return (e.touches && e.touches[0]) ? {x:e.touches[0].clientX,y:e.touches[0].clientY} : {x:e.clientX,y:e.clientY}; }
-
-    knob.addEventListener('mousedown', onStart); knob.addEventListener('touchstart', onStart, {passive:true});
-
-    function unlock(){
-      track.classList.add('gate-success');
-      gate.style.opacity = '0'; gate.style.pointerEvents='none';
-      setTimeout(()=> gate.remove(), 300);
-      mountMainWindow();
-    }
-
-    // Mount main window
-    function mountMainWindow(){
-      if(document.getElementById('main-window')) return; // idempotent
-      const tpl = document.getElementById('popup-template');
-      const node = tpl.content.firstElementChild.cloneNode(true);
-      deck.appendChild(node);
-      wireDraggable(node);
-      node.querySelector('.close-button').addEventListener('click', () => node.remove());
-    }
-
-    // Draggable behavior
-    function wireDraggable(el){
-      const header = el.querySelector('.header-drag');
-      let startX=0, startY=0, startLeft=0, startTop=0, dragging=false;
-
-      header.addEventListener('mousedown', startDrag);
-      header.addEventListener('touchstart', startDrag, {passive:true});
-
-      function startDrag(e){
-        dragging = true; el.style.zIndex = (++zCounter).toString();
-        const p = pointer(e);
-        const rect = el.getBoundingClientRect();
-        startX = p.x; startY = p.y; startLeft = rect.left; startTop = rect.top;
-        window.addEventListener('mousemove', onDrag);
-        window.addEventListener('touchmove', onDrag, {passive:false});
-        window.addEventListener('mouseup', endDrag);
-        window.addEventListener('touchend', endDrag);
-      }
-      function onDrag(e){
-        if(!dragging) return; e.preventDefault();
-        const p = pointer(e);
-        const dx = p.x - startX; const dy = p.y - startY;
-        el.style.left = (startLeft + dx) + 'px';
-        el.style.top  = (startTop + dy) + 'px';
-        el.style.transform = 'translate(0,0)';
-      }
-      function endDrag(){ dragging=false; window.removeEventListener('mousemove', onDrag); window.removeEventListener('touchmove', onDrag); }
-      function pointer(e){ if(e.touches && e.touches[0]) return {x:e.touches[0].clientX, y:e.touches[0].clientY}; return {x:e.clientX, y:e.clientY}; }
-    }
-
-    // Heart trail
-    const trailLife = 600; // ms
-    const trailSize = 16;  // px
-    let lastSpawn = 0;
-    window.addEventListener('mousemove', (e) => {
-      const now = performance.now();
-      if(now - lastSpawn < 18) return; // throttle
-      lastSpawn = now;
-      const t = document.createElement('div');
-      t.className = 'trail';
-      t.style.width = trailSize + 'px';
-      t.style.height = trailSize + 'px';
-      t.style.left = (e.clientX - trailSize/2) + 'px';
-      t.style.top  = (e.clientY - trailSize/2) + 'px';
-      t.style.opacity = '1';
-      document.body.appendChild(t);
-      t.animate([
-        { transform: 'translateY(0) scale(1)', opacity: 0.9 },
-        { transform: 'translateY(-10px) scale(0.9)', opacity: 0 }
-      ], { duration: trailLife, easing: 'ease-out' }).onfinish = () => t.remove();
-    }, {passive:true});
-  </script>
-</body>
-</html>
-      function endDrag(){ dragging=false; window.removeEventListener('mousemove', onDrag); window.removeEventListener('touchmove', onDrag); }
-      function pointer(e){
-        if(e.touches && e.touches[0]) return {x:e.touches[0].clientX, y:e.touches[0].clientY};
-        return {x:e.clientX, y:e.clientY};
-      }
-    }
-
-    // 3) Heart cursor trail (kept). Slightly reduced lifetime for elegance.
-    const trailLife = 600; // ms
-    const trailSize = 16;  // px
-    let lastSpawn = 0;
-    window.addEventListener('mousemove', (e) => {
-      const now = performance.now();
-      if(now - lastSpawn < 18) return; // throttle a bit
-      lastSpawn = now;
-      const t = document.createElement('div');
-      t.className = 'trail';
-      t.style.width = trailSize + 'px';
-      t.style.height = trailSize + 'px';
-      // position slightly offset so it trails the starfish cursor
-      t.style.left = (e.clientX - trailSize/2) + 'px';
-      t.style.top  = (e.clientY - trailSize/2) + 'px';
-      t.style.opacity = '1';
-      document.body.appendChild(t);
-      // fade + float up
-      t.animate([
-        { transform: 'translateY(0) scale(1)', opacity: 0.9 },
-        { transform: 'translateY(-10px) scale(0.9)', opacity: 0 }
-      ], { duration: trailLife, easing: 'ease-out' }).onfinish = () => t.remove();
-    }, {passive:true});
-      
-    // 4) Play/pause button is decorative rn (no audio wired yet)
-    //document.addEventListener('click', (e) => {
-      //if(e.target && e.target.id === 'play-pause-button'){
-        //e.target.textContent = (e.target.textContent.trim() === '▐▐') ? '▶' : '▐▐';
-      //} 
-    });
-  </script>
+            }, { once: true });
+        });
+    </script>
 </body>
 </html>
