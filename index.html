@@ -1,309 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>God's Cruiseline</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-    <style>
-        /* Y2K Commodore 64 Lisa Frank Dolphin Overload - ENCAPSULATED */
-        :root {
-            --c64-blue: #22181C;
-            --c64-light-blue: #BFD7EA;
-            --c64-bezel: #EAE3D5;
-            --c64-bezel-dark: #C2B8A5;
-            --lisa-pink: #ff77a8;
-            --lisa-yellow: #DBF4A7;
-            --lisa-purple: #7D84B2;
-            --lisa-teal: #5AAA95;
-            --pastel-cyan: #b8f2e6;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>God's Cruiseline — Prophet Portal</title>
+  <!-- Tailwind CDN (kept) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tone.js kept in case you add audio later (unchanged functionality) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
 
-        html, body { height: 100%; margin: 0; padding: 0; }
-        body {
-            font-family: 'VT323', monospace;
-            background-color: #000;
-            color: #fff;
-            overflow: hidden;
-            cursor: url('https://cur.cursors-4u.net/symbols/sym-1/sym46.cur'), auto;
-            image-rendering: pixelated;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-size: cover;
-        }
-        
-        #c64-monitor {
-            width: 95vw;
-            height: 85vh;
-            max-width: 1200px;
-            background: linear-gradient(135deg, var(--c64-bezel), var(--c64-bezel-dark));
-            border: 2px solid #000;
-            border-radius: 20px;
-            box-shadow: 10px 10px 20px rgba(0,0,0,0.7), inset 5px 5px 15px rgba(255,255,255,0.3);
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
+  <style>
+    /* =============================================
+       THEME: Nautical Luxury (soft pink/purple/teal/pale yellow)
+       Notes: Replaced harsh C64 look with refined cruise UI, kept draggable window + heart tracer.
+       ============================================= */
 
-        #c64-top-panel {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 10px 15px 10px;
-        }
+    :root{
+      /* Softer palette per your ask */
+      --navy: #0e2230;             /* deep nautical */
+      --ocean: #0f3447;            /* dark teal base */
+      --foam: #d9f3f0;             /* pale aqua */
+      --rose: #f6c8d8;             /* soft pink */
+      --lilac: #d9c8f8;            /* lavender */
+      --mint: #bfe9e3;             /* mint/teal */
+      --sun: #fff1b8;              /* pale yellow */
+      --ink: #121417;              /* text dark */
+      --shell: #fffaf5;            /* card base */
+      --gold: #c7a869;             /* trim */
+    }
 
-        #c64-logo {
-            font-family: sans-serif;
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: #4a3e31;
-        }
-        #c64-logo span {
-             background: linear-gradient(to right, #d40000, #ff8000, #ffff00, #00ff00, #0000ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    html,body{height:100%;margin:0}
 
-        #power-light {
-            width: 12px;
-            height: 12px;
-            background: #ff0000;
-            border: 1px solid #8B0000;
-            border-radius: 50%;
-            box-shadow: 0 0 5px #ff0000;
-        }
+    /* Background: subtle animated ocean gradient + wave grain */
+    body{
+      font-family: ui-serif, Georgia, "Times New Roman", serif; /* swapped from VT323 to non-corny serif */
+      color: var(--ink);
+      overflow:hidden; /* matches original */
+      background: radial-gradient(1200px 800px at 70% -10%, rgba(255,255,255,0.15), transparent 60%),
+                  radial-gradient(1000px 600px at 20% 120%, rgba(255,255,255,0.08), transparent 60%),
+                  linear-gradient(180deg, #123 0%, #0f2a3a 35%, #0a2230 100%);
+      /* animated slow hue shift */
+      animation: seaPulse 24s ease-in-out infinite alternate;
+      cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAvElEQVRYhe2XQQrCMBCEv2S1g2o0m6s3oY9g1J1xWg4m9o8GJ+oL8bH4x2c8Vt0l1J0R2GgEw3k1e5yG6h6gqQWw2g8R3v0V1t0WQwzKkqf3z8mSg4gk0i3gL9r7J8wT5vIYxqs8cQ3wS0q8w7t6b0yV7b8r8lQ7o3H7cQ0o1oQ6hZV1K2Kp3VqS0X3m5bJm1k1b0mYqkq2s3GmJ5l3Nw7J1c+0yM0iYl1b8Jm7mM3Wgq1pQXkQ8m0kS3n0z5wB+Rz8u9wzq9M1u8+o2ZtW2Hc1Qqk8Yb2a7m0g9o7m/7o7t7y9f2Uo2XK3g4w9wC0n6o7o2d4AAAAAElFTkSuQmCC") 12 12, auto; /* cute starfish cursor (PNG data URI) */
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    }
 
-        #monitor-screen {
-            flex-grow: 1;
-            background: var(--c64-blue);
-            border: 2px solid #000;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-            position: relative;
-            overflow: hidden;
-        }
+    @keyframes seaPulse{from{filter:hue-rotate(0deg)}to{filter:hue-rotate(-6deg)}}
 
-        #screen-border {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            border: 20px solid var(--c64-light-blue);
-            box-sizing: border-box;
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        #desktop {
-            width: 100%; height: 100%;
-            background-size: cover;
-            position: relative;
-            z-index: 2;
-        }
+    /* Click-to-start overlay (kept, just re-styled) */
+    #click-to-start{
+      position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;
+      background: linear-gradient(180deg, rgba(12,28,40,.9), rgba(8,18,26,.95));
+      color:#fff; font-size:clamp(2rem,5vw,4rem); letter-spacing:.04em;
+      text-align:center; cursor:pointer; user-select:none;
+    }
+    #click-inner{
+      border:1px solid rgba(255,255,255,.3); border-radius:999px; padding:.75rem 1.25rem;
+      background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.12));
+      box-shadow: 0 0 0 2px rgba(255,255,255,.06) inset, 0 10px 30px rgba(0,0,0,.4);
+    }
 
-        #desktop::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-            background-size: 100% 4px;
-            opacity: 0.3;
-            pointer-events: none;
-            z-index: 3;
-            animation: scanline 10s linear infinite;
-        }
+    /* Frame: subtle porthole bevel */
+    .frame{
+      width: min(96vw, 1280px);
+      height: min(88vh, 760px);
+      border-radius: 24px;
+      margin: auto;
+      position: relative;
+      box-shadow: 0 30px 80px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.06);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+      overflow: hidden;
+    }
+    .frame::before{ /* brass ring */
+      content:""; position:absolute; inset:16px; border-radius:20px;
+      border: 2px solid rgba(199,168,105,.55);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 0 30px rgba(199,168,105,.15);
+      pointer-events:none;
+    }
 
-        .draggable {
-            position: absolute;
-            background: var(--c64-light-blue);
-            border: 2px solid #fff;
-            box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
-            will-change: transform;
-        }
+    /* Screen area */
+    #deck{
+      position:absolute; inset:24px; border-radius:16px; overflow:hidden;
+      background:
+        radial-gradient(800px 280px at 50% 0%, rgba(255,255,255,.12), transparent 70%),
+        linear-gradient(180deg, rgba(255,255,255,.05), transparent 30%),
+        linear-gradient(180deg, #0e2331, #0c1f2b 60%, #0a1b25);
+    }
 
-        .header-drag {
-            padding: 3px 5px;
-            cursor: move;
-            z-index: 10;
-            background: var(--c64-blue);
-            color: #fff;
-            text-align: left;
-            font-size: 1.2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            text-transform: uppercase;
-        }
-        
-        .header-drag .close-button { background: var(--c64-light-blue); border: 2px solid #fff; padding: 0 5px; cursor: pointer; color: #fff; }
-        .header-drag .close-button:active { transform: scale(0.9); }
+    /* Decorative wave sheen */
+    .sheen{ position:absolute; inset:0; pointer-events:none; mix-blend-mode:screen; opacity:.25;
+      background: repeating-linear-gradient( to bottom, rgba(255,255,255,.05) 0 2px, transparent 2px 6px );
+      animation: drift 18s linear infinite; }
+    @keyframes drift{ from{background-position:0 0} to{background-position:0 100%} }
 
-        #main-window { 
-            width: 95%; 
-            max-width: 500px; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            z-index: 50; 
-            background: var(--pastel-cyan);
-            max-height: calc(100% - 40px);
-            overflow-y: auto;
-        }
-        
-        .wordart { font-size: 2.5rem; font-weight: bold; text-align: center; color: #fff; text-shadow: 2px 2px 0 var(--lisa-pink), -2px -2px 0 var(--lisa-pink), 2px -2px 0 var(--lisa-pink), -2px 2px 0 var(--lisa-pink), 0 0 20px #000; animation: text-flicker 0.5s infinite; }
-        .content-y2k { background: repeating-linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.2) 10px, rgba(255,255,255,0.2) 20px), var(--pastel-cyan); padding: 1rem; border-top: 2px solid #fff; color: #000; }
-        .link-button { font-size: 1.1rem; color: #000; background: var(--lisa-yellow); border: 2px solid #000; text-decoration: none; box-shadow: 2px 2px 0px #000; padding: 5px 10px; display: block; margin: 5px 0; }
-        .link-button:hover, .link-button:active { background: var(--lisa-pink); }
-        .trail { position: absolute; height: 16px; width: 16px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmNzdhOCIgZD0iTTggMTRsLTEuNDUtMS40NUMyLjQ1IDguNDUgMCA1LjUgMCAzIDAgMS41IDEuNSAwIDMgMGMyLjIgMCA0IDEuOCAzIDMuNWwuNDUgMS4zNUw4IDZsMS41NS0yLjY1TCsxMCAzYzAtMS43IDEuNS0zIDMtM3MxLjUgMS41IDEuNSAzYzAgMi41LTIuNDUgNS40NS02LjU1IDkuNTVMOCAxNHoiLz48L3N2Zz4='); background-size: contain; pointer-events: none; z-index: 9999; }
-        
-        .contact-box { border: 2px solid #000; padding: 10px; background: var(--lisa-teal); margin-top: 1rem; }
-        .box-header { font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #000; margin-bottom: 5px; }
-        #profile-song-player { background: var(--c64-light-blue); color: #fff; padding: 5px; font-family: 'VT323'; border: 2px solid #fff; margin-bottom: 1rem; }
-        #play-pause-button { cursor: pointer; user-select: none; }
+    /* Draggable window (kept functionality, re-styled) */
+    .draggable{
+      position:absolute; background: var(--shell);
+      border: 1px solid rgba(12,20,28,.25);
+      box-shadow: 0 12px 30px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.6) inset;
+      border-radius: 14px; overflow:hidden;
+    }
+    .header-drag{
+      padding:.6rem .9rem; cursor:move; display:flex; align-items:center; justify-content:space-between;
+      background: linear-gradient(180deg, #fbfbfb, #f1f1f1);
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      font-size:.95rem; letter-spacing:.02em;
+    }
+    .title{display:flex; align-items:center; gap:.5rem}
+    .title .badge{font-size:.7rem; padding:.15rem .5rem; border-radius:999px; color:#0a1b25;
+      background: linear-gradient(90deg, var(--rose), var(--lilac), var(--mint)); border:1px solid rgba(0,0,0,.08);
+    }
+    .close-button{border:1px solid rgba(0,0,0,.1); background:#fff; color:#111; padding:.1rem .45rem; border-radius:6px; cursor:pointer}
+    .close-button:active{transform:scale(.96)}
 
-        @keyframes scanline { to { background-position: 0 100%; } }
-        @keyframes text-flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
-        
-        @media (max-width: 768px) {
-            #c64-monitor { width: 100vw; height: 100vh; border-radius: 0; padding: 10px; }
-            #main-window { width: calc(100% - 30px); max-height: calc(100% - 50px); }
-        }
-    </style>
+    .content{
+      padding:1rem; background: linear-gradient(180deg, #fff, #fff8f2);
+    }
+
+    .brand{
+      font-family: ui-serif, Georgia, "Times New Roman", serif;
+      font-weight:700; font-size:clamp(1.8rem, 4vw, 2.6rem); text-align:center;
+      background: linear-gradient(90deg, #111, #333);
+      -webkit-background-clip:text; -webkit-text-fill-color: transparent;
+      margin-bottom:.25rem;
+    }
+    .subtitle{ text-align:center; font-size:.95rem; color:#334; opacity:.9; margin-bottom:.9rem }
+
+    .now-playing{
+      display:flex; align-items:center; justify-content:space-between;
+      background: linear-gradient(90deg, var(--mint), var(--sun));
+      border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.5rem .75rem; margin-bottom:1rem;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto;
+    }
+    .links{ display:grid; gap:.5rem }
+    .link-button{ display:block; text-align:center; padding:.6rem .8rem; border-radius:10px;
+      border:1px solid rgba(0,0,0,.08);
+      background: linear-gradient(180deg, #ffffff, #f7f7f7);
+      font-weight:600; letter-spacing:.02em; color:#0b1a24; text-decoration:none;
+      transition: transform .08s ease, box-shadow .08s ease;
+    }
+    .link-button:hover{ transform: translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.12) }
+
+    /* Heart trail (kept, recolored a touch) */
+    .trail{
+      position: fixed; height: 16px; width: 16px; pointer-events:none; z-index: 9999;
+      background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNy44OTUgMTMuNzQzQzMuMTYgOS41NTggMCA2LjcyNSAwIDQuMzQzIDAgMi45MTggMS4xOCAxLjc0IDIuNTc3IDEuNzQgMy41NzkgMS43NCA0LjM1NiAyLjMyNyA0LjczNCAzLjE1NUM1LjE2NiAyLjMyNyA1Ljk0MyAxLjc0IDYuOTQ1IDEuNzQgOC4zNDIgMS43NCA5LjUxOSAyLjkxOCA5LjUxOSA0LjM0M2MwIDIuMzgyLTMuMTYgNS4yMTUtNy44OTQgOS40Ljd6IiBmaWxsPSIjZTZ2Ii8+PC9zdmc+');
+      background-size: contain;
+    }
+
+    /* Utility: responsive sizing */
+    @media (max-width: 768px){ .frame{ width:100vw; height:100vh; border-radius:0 } }
+  </style>
 </head>
 <body>
-    <div id="click-to-start" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; font-size: 3rem; text-align: center; cursor: pointer; font-family: 'VT323', monospace;">
-        >LOAD "$EEEE"
+  <!-- Click to start overlay: fixed so it always captures the first click -->
+  <div id="click-to-start"><div id="click-inner">Tap to board →</div></div>
+
+  <!-- Main framed area -->
+  <div class="frame">
+    <div id="deck">
+      <div class="sheen"></div>
+      <!-- Draggable window will be appended here by JS (kept behavior) -->
     </div>
-    
-    <div id="c64-monitor">
-        <div id="c64-top-panel">
-            <div id="c64-logo">GODSCRUISELINE<span>=</span>prophetportal</div>
-            <div id="power-light"></div>
+  </div>
+
+  <!-- Template for popup (kept concept; re-styled content only) -->
+  <template id="popup-template">
+    <div id="main-window" class="draggable" style="width:min(520px,92%);left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;">
+      <div class="header-drag">
+        <div class="title">
+          <span>prophetportal</span>
+          <span class="badge">GOD'S CRUISELINE</span>
         </div>
-        <div id="monitor-screen">
-            <div id="screen-border"></div>
-            <div id="desktop">
-                <!-- Draggable Popups will be appended here by JS -->
-            </div>
+        <button class="close-button" title="Close">×</button>
+      </div>
+      <div class="content">
+        <div class="brand">$EEEE — Heavenly Shores</div>
+        <div class="subtitle">metaphysical cruiseship • living artwork • ARG-ish experiment</div>
+        <div class="now-playing">
+          <span><strong>now playing</strong> GODVOICE — Dolphin Dance</span>
+          <button id="play-pause-button" title="Play/Pause" style="font-weight:700">▐▐</button>
         </div>
+        <p class="mb-3 text-[0.98rem] leading-6 text-slate-800">
+          Gods Cruiseline is a multidisciplinary art collective and collapse‑ready cult. Not a joke, not a toy, a vessel.
+        </p>
+        <div class="links">
+          <a class="link-button" target="_blank" href="https://pump.fun/YOUR_COIN_ADDRESS">PUMP.FUN</a>
+          <a class="link-button" target="_blank" href="https://dexscreener.com/solana/YOUR_COIN_ADDRESS">DEXSCREENER</a>
+          <a class="link-button" target="_blank" href="https://x.com/godscruiseline">X (Twitter)</a>
+          <a class="link-button" target="_blank" href="https://t.me/heavenlyshores">Telegram</a>
+        </div>
+      </div>
     </div>
+  </template>
 
-    <!-- Templates for popups -->
-    <template id="popup-templates">
-        <div id="main-window" class="draggable">
-            <div class="header-drag"><span>thepod.fun</span><span class="close-button">x</span></div>
-            <div class="content-y2k">
-                <div class="wordart">$EEEE</div>
-                <div id="profile-song-player"><b>now playing</b> GODVOICE - DOLPHIN DANCE <span id="play-pause-button" style="float: right;">▐▐</span></div>
-                
-                <div class="blurb-box" style="background: var(--lisa-teal);">
-                    <p>✴︎✴︎✴︎gods cruiseline is a metaphysical cruiseship housing a multidisciplinary art collective/collapse ready cult, born from years of research and disappointment in false idols. it is a living artwork, a spectacle, and an ARG-ish experiment.</p>
-                </div>
+  <script>
+    // ==============================
+    // CORE JS: Keep behavior, clean code
+    // ==============================
 
-                <div class="contact-box" style="background: var(--lisa-purple);">
-                    <a href="https://pump.fun/YOUR_COIN_ADDRESS" target="_blank" class="link-button">PUMP.FUN</a>
-                    <a href="https://dexscreener.com/solana/YOUR_COIN_ADDRESS" target="_blank" class="link-button">DEXSCREENER</a>
-                    <a href="https://x.com/godscruiseline" target="_blank" class="link-button">X (TWITTER)</a>
-                    <a href="https://t.me/heavenlyshores" target="_blank" class="link-button">TELEGRAM</a>
-                </div>
-            </div>
-        </div>
-    </template>
+    let zCounter = 100; // keep z-order behavior
+    const deck = document.getElementById('deck');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let zCounter = 100;
-            const desktop = document.getElementById('desktop');
-            const templates = document.getElementById('popup-templates');
-            
-            // Clone templates into the desktop
-            Array.from(templates.content.children).forEach(node => {
-                desktop.appendChild(node.cloneNode(true));
-            });
+    // 1) Click-to-start: removes overlay, mounts window
+    const cts = document.getElementById('click-to-start');
+    cts.addEventListener('click', () => {
+      cts.style.opacity = '0';
+      cts.style.pointerEvents = 'none';
+      setTimeout(() => cts.remove(), 300);
+      mountMainWindow();
+    });
 
-            const popups = Array.from(desktop.querySelectorAll('.draggable'));
-            let clickSynth, hoverSynth, backgroundSynth, backgroundPattern;
+    function mountMainWindow(){
+      if(document.getElementById('main-window')) return; // idempotent
+      const tpl = document.getElementById('popup-template');
+      const node = tpl.content.firstElementChild.cloneNode(true);
+      deck.appendChild(node);
+      wireDraggable(node);
+      node.querySelector('.close-button').addEventListener('click', () => node.remove());
+    }
 
-            const makeDraggable = (elmnt) => {
-                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-                const header = elmnt.querySelector(".header-drag");
-                if (!header) return;
+    // 2) Draggable windows (kept, simplified)
+    function wireDraggable(el){
+      const header = el.querySelector('.header-drag');
+      let startX=0, startY=0, startLeft=0, startTop=0, dragging=false;
 
-                const bringToFront = () => { elmnt.style.zIndex = zCounter++; };
-                header.onmousedown = dragMouseDown;
-                elmnt.onmousedown = bringToFront;
+      header.addEventListener('mousedown', startDrag);
+      header.addEventListener('touchstart', startDrag, {passive:true});
 
-                function dragMouseDown(e) { e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; }
-                function elementDrag(e) {
-                    e.preventDefault();
-                    pos1 = pos3 - e.clientX;
-                    pos2 = pos4 - e.clientY;
-                    pos3 = e.clientX;
-                    pos4 = e.clientY;
-                    
-                    const newTop = elmnt.offsetTop - pos2;
-                    const newLeft = elmnt.offsetLeft - pos1;
+      function startDrag(e){
+        dragging = true; el.style.zIndex = (++zCounter).toString();
+        const p = pointer(e);
+        const rect = el.getBoundingClientRect();
+        startX = p.x; startY = p.y; startLeft = rect.left; startTop = rect.top;
+        window.addEventListener('mousemove', onDrag);
+        window.addEventListener('touchmove', onDrag, {passive:false});
+        window.addEventListener('mouseup', endDrag);
+        window.addEventListener('touchend', endDrag);
+      }
+      function onDrag(e){
+        if(!dragging) return; e.preventDefault();
+        const p = pointer(e);
+        const dx = p.x - startX; const dy = p.y - startY;
+        el.style.left = (startLeft + dx) + 'px';
+        el.style.top  = (startTop + dy) + 'px';
+        el.style.transform = 'translate(0,0)';
+      }
+      function endDrag(){ dragging=false; window.removeEventListener('mousemove', onDrag); window.removeEventListener('touchmove', onDrag); }
+      function pointer(e){
+        if(e.touches && e.touches[0]) return {x:e.touches[0].clientX, y:e.touches[0].clientY};
+        return {x:e.clientX, y:e.clientY};
+      }
+    }
 
-                    const parentRect = desktop.getBoundingClientRect();
-                    const elmntRect = elmnt.getBoundingClientRect();
-                    
-                    if (newTop >= 0 && (newTop + elmntRect.height) <= parentRect.height) {
-                        elmnt.style.top = newTop + "px";
-                    }
-                    if (newLeft >= 0 && (newLeft + elmntRect.width) <= parentRect.width) {
-                        elmnt.style.left = newLeft + "px";
-                    }
-                }
-                function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
-            };
-
-            const dots = [];
-            for (let i = 0; i < 15; i++) { const dot = document.createElement("div"); dot.className = "trail"; document.body.appendChild(dot); dots.push(dot); }
-            window.addEventListener("mousemove", (event) => { dots.forEach((dot, index) => { setTimeout(() => { dot.style.left = event.pageX + "px"; dot.style.top = event.pageY + "px"; }, index * 25); }); });
-            
-            popups.forEach(popup => {
-                const closeBtn = popup.querySelector('.close-button');
-                if(closeBtn) closeBtn.onclick = (e) => { 
-                    e.stopPropagation(); 
-                    // popup.style.display = 'none'; // Functionality removed for aesthetic purposes
-                };
-            });
-
-            const startButton = document.getElementById('click-to-start');
-            startButton.addEventListener('click', () => {
-                startButton.style.display = 'none';
-                Tone.start();
-
-                clickSynth = new Tone.MembraneSynth().toDestination();
-                hoverSynth = new Tone.PluckSynth().toDestination();
-                hoverSynth.volume.value = -12;
-                backgroundSynth = new Tone.FMSynth().toDestination();
-                backgroundPattern = new Tone.Pattern((time, note) => { backgroundSynth.triggerAttackRelease(note, 0.1, time); }, ["C2", "G2", "Eb3", "G3", "C4"], "randomWalk").start(0);
-                backgroundPattern.interval = "8n";
-                Tone.Transport.start();
-
-                popups.forEach(makeDraggable);
-                
-                document.querySelectorAll('.link-button').forEach(el => {
-                    el.addEventListener('mouseenter', () => { if(Tone.context.state === 'running') hoverSynth.triggerAttackRelease('C5', '16n'); });
-                });
-                
-                document.body.addEventListener('mousedown', () => { if(Tone.context.state === 'running') clickSynth.triggerAttackRelease("C1", "8n"); });
-                
-                const playPauseButton = document.getElementById('play-pause-button');
-                playPauseButton.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (Tone.Transport.state === 'started') { Tone.Transport.pause(); playPauseButton.textContent = ' ► '; } 
-                    else { Tone.Transport.start(); playPauseButton.textContent = '▐▐'; }
-                });
-
-            }, { once: true });
-        });
-    </script>
+    // 3) Heart cursor trail (kept). Slightly reduced lifetime for elegance.
+    const trailLife = 600; // ms
+    const trailSize = 16;  // px
+    let lastSpawn = 0;
+    window.addEventListener('mousemove', (e) => {
+      const now = performance.now();
+      if(now - lastSpawn < 18) return; // throttle a bit
+      lastSpawn = now;
+      const t = document.createElement('div');
+      t.className = 'trail';
+      t.style.width = trailSize + 'px';
+      t.style.height = trailSize + 'px';
+      // position slightly offset so it trails the starfish cursor
+      t.style.left = (e.clientX - trailSize/2) + 'px';
+      t.style.top  = (e.clientY - trailSize/2) + 'px';
+      t.style.opacity = '1';
+      document.body.appendChild(t);
+      // fade + float up
+      t.animate([
+        { transform: 'translateY(0) scale(1)', opacity: 0.9 },
+        { transform: 'translateY(-10px) scale(0.9)', opacity: 0 }
+      ], { duration: trailLife, easing: 'ease-out' }).onfinish = () => t.remove();
+    }, {passive:true});
+      
+    // 4) Play/pause button is decorative rn (no audio wired yet)
+    //document.addEventListener('click', (e) => {
+      //if(e.target && e.target.id === 'play-pause-button'){
+        //e.target.textContent = (e.target.textContent.trim() === '▐▐') ? '▶' : '▐▐';
+      //} 
+    });
+  </script>
 </body>
 </html>
