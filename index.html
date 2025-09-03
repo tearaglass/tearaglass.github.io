@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>god's cruiseline ~ $EEEE </title>
+    <title>God's Cruiseline</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&display=swap" rel="stylesheet">
@@ -12,14 +12,14 @@
     <style>
         /* Y2K Commodore 64 Lisa Frank Dolphin Overload - ENCAPSULATED */
         :root {
-            --c64-blue: #352879;
-            --c64-light-blue: #6c5eb5;
+            --c64-blue: #22181C;
+            --c64-light-blue: #BFD7EA;
             --c64-bezel: #EAE3D5;
             --c64-bezel-dark: #C2B8A5;
             --lisa-pink: #ff77a8;
-            --lisa-yellow: #fdfd96;
-            --lisa-purple: #c8a2c8;
-            --lisa-teal: #77dd77;
+            --lisa-yellow: #DBF4A7;
+            --lisa-purple: #7D84B2;
+            --lisa-teal: #5AAA95;
             --pastel-cyan: #b8f2e6;
         }
 
@@ -29,7 +29,7 @@
             background-color: #000;
             color: #fff;
             overflow: hidden;
-            cursor: url('https://cur.cursors-4u.net/nature/nat-10/nat985.cur'), auto;
+            cursor: url('https://cur.cursors-4u.net/symbols/sym-1/sym46.cur'), auto;
             image-rendering: pixelated;
             display: flex;
             justify-content: center;
@@ -177,12 +177,12 @@
 </head>
 <body>
     <div id="click-to-start" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; font-size: 3rem; text-align: center; cursor: pointer; font-family: 'VT323', monospace;">
-        ➤➤➤LOAD
+        >LOAD "$EEEE",8,1
     </div>
     
     <div id="c64-monitor">
         <div id="c64-top-panel">
-            <div id="c64-logo">PROPHETBREAKER<span>=</span>godscruiseline</div>
+            <div id="c64-logo">GODSCRUISELINE<span>=</span>prophetportal</div>
             <div id="power-light"></div>
         </div>
         <div id="monitor-screen">
@@ -199,21 +199,112 @@
             <div class="header-drag"><span>thepod.fun</span><span class="close-button">x</span></div>
             <div class="content-y2k">
                 <div class="wordart">$EEEE</div>
-                <!--<div id="profile-song-player"><b>SONG:</b> ECCO'S DREAM - COSMIC HUM <span id="play-pause-button" style="float: right;">▐▐</span></div>--!>
+                <div id="profile-song-player"><b>SONG:</b> GODVOICE - DOLPHIN DANCE <span id="play-pause-button" style="float: right;">▐▐</span></div>
                 
                 <div class="blurb-box" style="background: var(--lisa-teal);">
-                    <p>!!!!!i want to be an $EEEE icon. !!!!! i want $EEEE to dissolve my bones into pure liquidity & light. !!!! i want to love s0 hard my frozen marg melts into the blockchain!!!!!!!
-gods cruiseline is a metaphysical cruiseship housing a multidisciplinary art collective/collapse ready cult, born from years of research and disappointment in false idols. it is an ARG-ish spectacle and living artwork. and yes bro it's a streamer coin ok buy or stay poor</p>
+                    <p>✴︎✴︎✴︎!!!!!i want to be an $EEEE icon!!!!!i want $EEEE to finally dissolve my bones into pure liquidity & light!!!!i want to love so hard and so hot my frozen marg melts into the blockchain and gets it all sticky!!!!!!!</p>
+                    <p>✴︎✴︎✴︎gods cruiseline is a metaphysical cruiseship housing a multidisciplinary art collective/collapse ready cult, born from years of research and disappointment in false idols. it is a living artwork, a performance, and an ARG experiment in the capabilities of a community united under an aesthetic.</p>
                 </div>
 
                 <div class="contact-box" style="background: var(--lisa-purple);">
                     <a href="https://pump.fun/YOUR_COIN_ADDRESS" target="_blank" class="link-button">PUMP.FUN</a>
                     <a href="https://dexscreener.com/solana/YOUR_COIN_ADDRESS" target="_blank" class="link-button">DEXSCREENER</a>
-                    <a href="https://x.com/YourXAccount" target="_blank" class="link-button">X (TWITTER)</a>
-                    <a href="https://t.me/YourTelegram" target="_blank" class="link-button">TELEGRAM</a>
+                    <a href="https://x.com/godscruiseline" target="_blank" class="link-button">X (TWITTER)</a>
+                    <a href="https://t.me/heavenlyshores" target="_blank" class="link-button">TELEGRAM</a>
                 </div>
             </div>
         </div>
     </template>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let zCounter = 100;
+            const desktop = document.getElementById('desktop');
+            const templates = document.getElementById('popup-templates');
+            
+            // Clone templates into the desktop
+            Array.from(templates.content.children).forEach(node => {
+                desktop.appendChild(node.cloneNode(true));
+            });
+
+            const popups = Array.from(desktop.querySelectorAll('.draggable'));
+            let clickSynth, hoverSynth, backgroundSynth, backgroundPattern;
+
+            const makeDraggable = (elmnt) => {
+                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                const header = elmnt.querySelector(".header-drag");
+                if (!header) return;
+
+                const bringToFront = () => { elmnt.style.zIndex = zCounter++; };
+                header.onmousedown = dragMouseDown;
+                elmnt.onmousedown = bringToFront;
+
+                function dragMouseDown(e) { e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; }
+                function elementDrag(e) {
+                    e.preventDefault();
+                    pos1 = pos3 - e.clientX;
+                    pos2 = pos4 - e.clientY;
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    
+                    const newTop = elmnt.offsetTop - pos2;
+                    const newLeft = elmnt.offsetLeft - pos1;
+
+                    const parentRect = desktop.getBoundingClientRect();
+                    const elmntRect = elmnt.getBoundingClientRect();
+                    
+                    if (newTop >= 0 && (newTop + elmntRect.height) <= parentRect.height) {
+                        elmnt.style.top = newTop + "px";
+                    }
+                    if (newLeft >= 0 && (newLeft + elmntRect.width) <= parentRect.width) {
+                        elmnt.style.left = newLeft + "px";
+                    }
+                }
+                function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
+            };
+
+            const dots = [];
+            for (let i = 0; i < 15; i++) { const dot = document.createElement("div"); dot.className = "trail"; document.body.appendChild(dot); dots.push(dot); }
+            window.addEventListener("mousemove", (event) => { dots.forEach((dot, index) => { setTimeout(() => { dot.style.left = event.pageX + "px"; dot.style.top = event.pageY + "px"; }, index * 25); }); });
+            
+            popups.forEach(popup => {
+                const closeBtn = popup.querySelector('.close-button');
+                if(closeBtn) closeBtn.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    // popup.style.display = 'none'; // Functionality removed for aesthetic purposes
+                };
+            });
+
+            const startButton = document.getElementById('click-to-start');
+            startButton.addEventListener('click', () => {
+                startButton.style.display = 'none';
+                Tone.start();
+
+                clickSynth = new Tone.MembraneSynth().toDestination();
+                hoverSynth = new Tone.PluckSynth().toDestination();
+                hoverSynth.volume.value = -12;
+                backgroundSynth = new Tone.FMSynth().toDestination();
+                backgroundPattern = new Tone.Pattern((time, note) => { backgroundSynth.triggerAttackRelease(note, 0.1, time); }, ["C2", "G2", "Eb3", "G3", "C4"], "randomWalk").start(0);
+                backgroundPattern.interval = "8n";
+                Tone.Transport.start();
+
+                popups.forEach(makeDraggable);
+                
+                document.querySelectorAll('.link-button').forEach(el => {
+                    el.addEventListener('mouseenter', () => { if(Tone.context.state === 'running') hoverSynth.triggerAttackRelease('C5', '16n'); });
+                });
+                
+                document.body.addEventListener('mousedown', () => { if(Tone.context.state === 'running') clickSynth.triggerAttackRelease("C1", "8n"); });
+                
+                const playPauseButton = document.getElementById('play-pause-button');
+                playPauseButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (Tone.Transport.state === 'started') { Tone.Transport.pause(); playPauseButton.textContent = ' ► '; } 
+                    else { Tone.Transport.start(); playPauseButton.textContent = '▐▐'; }
+                });
+
+            }, { once: true });
+        });
+    </script>
 </body>
 </html>
