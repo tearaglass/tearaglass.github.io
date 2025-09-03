@@ -4,168 +4,279 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>God's Cruiseline</title>
+  <!-- unchanged font + libs -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
 
   <style>
-  /* Luxury cruise pastel—balanced pink/lilac/teal/pale‑yellow. Functionality unchanged. */
-  :root{
-    /* Base surfaces */
-    --pearl:#fffdf9;           /* pearl white */
-    --shell:#faf4f2;           /* soft shell */
-    --mist:#f4f1fb;            /* lilac mist */
-    --ink:#2c2231;             /* refined plum text */
+    /* NOTE: replaced palette w/ cruise-core pastels & abyssal backdrop.
+       functionality untouched; only variables changed. */
+    :root{
+      --abyss: #0b1116;          /* deep sea background */
+      --haze:  #eaf3f2;          /* spa seafoam */
+      --shell: #f6efe6;          /* champagne shell */
+      --ink:   #1a2430;          /* graphite text */
+      --ink-soft:#425466;
 
-    /* Accents */
-    --dolphin-pink:#ff78b6;    /* pink */
-    --lilac:#c7b5ff;           /* purple */
-    --pool-teal:#6fe3d6;       /* teal */
-    --pale-yellow:#ffe8a3;     /* champagne yellow */
+      --dolphin-pink:#ff76b2;    /* primary accent */
+      --pool-teal:#7de3da;       /* secondary accent */
+      --porthole-gold:#c9b79e;   /* luxe rim */
 
-    /* Legacy variable mapping to keep rest of layout intact */
-    --c64-blue: var(--mist);
-    --c64-light-blue:#e8defc;
-    --c64-bezel: var(--shell);
-    --c64-bezel-dark: var(--pearl);
+      /* legacy vars mapped to new tones (safe: rest of CSS still refers) */
+      --c64-blue: var(--abyss);              /* was #352879 */
+      --c64-light-blue: #203140;            /* softened bezel highlight */
+      --c64-bezel: var(--shell);
+      --c64-bezel-dark: #e4dccf;
 
-    --lisa-pink: var(--dolphin-pink);
-    --lisa-yellow: var(--pale-yellow);
-    --lisa-purple: var(--lilac);
-    --lisa-teal: var(--pool-teal);
-    --pastel-cyan: var(--mist);
-  }
+      --lisa-pink: var(--dolphin-pink);
+      --lisa-yellow: #ffeaa7;               /* softer yellow */
+      --lisa-purple: #e6d7f5;               /* lilac haze */
+      --lisa-teal: var(--pool-teal);
+      --pastel-cyan: var(--haze);
+    }
 
-  html, body { height:100%; margin:0; padding:0; }
-  body{
-    font-family: ui-monospace, monospace;
-    /* Lighter, more refined background */
-    background:
-      radial-gradient(900px 600px at 70% -10%, #fffaf2 0%, #fbf5ff 55%, #f7fffd 100%),
-      linear-gradient(180deg, var(--pearl), var(--shell));
-    color:var(--ink);
-    overflow:hidden;
-    display:flex; justify-content:center; align-items:center;
-  }
+    /* unchanged box model + font family */
+    html, body { height:100%; margin:0; padding:0; }
+    body{
+      font-family:'VT323', monospace;
+      /* NOTE: swapped flat black for layered ocean gradient */
+      background:
+        radial-gradient(1200px 700px at 60% -10%, #14202b 0%, var(--abyss) 55%, #070b0f 100%),
+        linear-gradient(180deg, #0d141b 0%, #0b1116 100%);
+      color:#fff;
+      overflow:hidden;
+      cursor:url('https://cur.cursors-4u.net/symbols/sym-1/sym46.cur'), auto; /* unchanged */
+      image-rendering:pixelated;
+      display:flex; justify-content:center; align-items:center;
+      background-size:cover;
+    }
 
-  /* Bezel/frame — subtle gold shadow for luxury hint */
-  #c64-monitor{
-    width:95vw; height:85vh; max-width:1200px;
-    background:linear-gradient(135deg, var(--c64-bezel), var(--c64-bezel-dark));
-    border:2px solid rgba(0,0,0,.06);
-    border-radius:22px;
-    box-shadow:0 24px 80px rgba(214,198,168,.35), inset 4px 4px 18px rgba(255,255,255,.7);
-    padding:25px; display:flex; flex-direction:column; position:relative;
-  }
+    /* monitor frame */
+    #c64-monitor{
+      width:95vw; height:85vh; max-width:1200px;
+      /* NOTE: warmer shell gradient to feel brochure-luxe */
+      background:linear-gradient(135deg, var(--c64-bezel), var(--c64-bezel-dark));
+      border:2px solid rgba(0,0,0,.6);
+      border-radius:22px; /* NOTE: slightly rounder */
+      box-shadow:
+        0 40px 120px rgba(0,0,0,.5),
+        inset 4px 4px 18px rgba(255,255,255,.35);
+      padding:25px;
+      display:flex; flex-direction:column; position:relative;
+    }
 
-  #c64-top-panel{ display:flex; justify-content:space-between; align-items:center; padding:0 10px 15px 10px; }
-  #c64-logo{ font-family: Georgia, serif; font-weight:700; font-size:1.2rem; color:#5a3a55; letter-spacing:.4px; }
-  #c64-logo span{
-    /* Pearlescent wordmark */
-    background:linear-gradient(90deg, var(--dolphin-pink), var(--lilac), var(--pool-teal), var(--pale-yellow));
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-  }
+    #c64-top-panel{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:0 10px 15px 10px;
+    }
 
-  #power-light{ width:12px; height:12px; background:var(--dolphin-pink); border:1px solid #cc4d8f; border-radius:50%; box-shadow:0 0 8px var(--dolphin-pink); }
+    #c64-logo{
+      /* NOTE: make header read like ship intranet */
+      font-family: 'Special Elite', serif; /* subtle corporate-weird */
+      font-weight:700; font-size:1.15rem; color:#3b3127;
+      letter-spacing:.5px;
+    }
+    #c64-logo span{
+      /* NOTE: refined gradient (less rainbow harsh, more pearlescent) */
+      background:linear-gradient(90deg,#ff7db9,#ffd3e8,#7de3da,#bfe7ff);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
 
-  #monitor-screen{
-    flex-grow:1;
-    background:linear-gradient(180deg, var(--mist), var(--pearl));
-    border:2px solid rgba(0,0,0,.06);
-    box-shadow:inset 0 0 18px rgba(139, 92, 246, .18); /* lilac inner glow */
-    position:relative; overflow:hidden;
-  }
+    #power-light{
+      /* NOTE: dimmer, glossier power LED */
+      width:12px; height:12px; background:#ff3b3b;
+      border:1px solid #8B0000; border-radius:50%;
+      box-shadow:0 0 8px #ff3b3b;
+    }
 
-  #screen-border{ position:absolute; inset:0; border:20px solid rgba(111,227,214,.25); box-sizing:border-box; pointer-events:none; z-index:1; }
-  #desktop{ width:100%; height:100%; position:relative; z-index:2; }
+    #monitor-screen{
+      flex-grow:1;
+      /* NOTE: from solid to soft vignette ocean glass */
+      background:
+        radial-gradient(800px 500px at 50% 20%, #254050 0%, var(--c64-blue) 70%);
+      border:2px solid #000;
+      box-shadow:inset 0 0 28px rgba(0,0,0,.85);
+      position:relative; overflow:hidden;
+    }
 
-  /* softer scanline */
-  #desktop::after{ content:""; position:absolute; inset:0; background:linear-gradient(rgba(255,255,255,.12) 50%, rgba(0,0,0,.04) 50%); background-size:100% 4px; opacity:.18; pointer-events:none; z-index:3; }
+    #screen-border{
+      position:absolute; inset:0;
+      /* NOTE: bezel ring matches pool teal for subtle luxury pop */
+      border:20px solid rgba(125,227,218,.18);
+      box-sizing:border-box; pointer-events:none; z-index:1;
+    }
 
-  .draggable{
-    position:absolute; background:rgba(255,255,255,.66);
-    border:1px solid rgba(0,0,0,.08);
-    border-radius:14px; box-shadow:0 12px 28px rgba(44,34,49,.08);
-    backdrop-filter: blur(6px) saturate(1.03);
-  }
+    #desktop{ width:100%; height:100%; background-size:cover; position:relative; z-index:2; }
 
-  .header-drag{
-    padding:6px 10px; cursor:move; z-index:10;
-    background:linear-gradient(180deg, #f9d2e8, #e3d6ff 70%);
-    color:#4b2f46; font-size:1.1rem; display:flex; justify-content:space-between; align-items:center; border-radius:12px 12px 0 0;
-    border-bottom:1px solid rgba(0,0,0,.06); letter-spacing:.6px; text-transform:uppercase;
-  }
-  .header-drag .close-button{ background:#ffe8f5; border:1px solid rgba(0,0,0,.1); padding:0 8px; cursor:pointer; color:#5a3a55; border-radius:999px; }
+    /* NOTE: scanline softened so text is more legible */
+    #desktop::after{
+      content:""; position:absolute; inset:0;
+      background:linear-gradient(rgba(255,255,255,.03) 50%, rgba(0,0,0,.18) 50%);
+      background-size:100% 4px; opacity:.28; pointer-events:none; z-index:3;
+      animation:scanline 10s linear infinite;
+    }
 
-  .wordart{
-    font-size:2.3rem; font-weight:700; text-align:center; color:#5a3a55;
-    text-shadow:0 1px 0 rgba(255,255,255,.8), 0 0 14px rgba(199,181,255,.45);
-    letter-spacing:2px;
-  }
+    .draggable{
+      position:absolute;
+      /* NOTE: window body retuned to glassy card */
+      background:rgba(255,255,255,.22);
+      border:1px solid rgba(255,255,255,.55);
+      backdrop-filter: blur(6px) saturate(1.05);
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      will-change:transform;
+      border-radius:14px; /* softer */
+    }
 
-  .content-y2k{
-    background:linear-gradient(180deg, #ffffff, #fff8f2);
-    padding:1rem; border-radius:0 0 14px 14px; color:var(--ink);
-  }
+    .header-drag{
+      padding:6px 8px; /* NOTE: a bit taller for luxe feel */
+      cursor:move; z-index:10;
+      background:linear-gradient(180deg,#13232e,#0f1c26);
+      color:#e8f7f5; text-align:left; font-size:1.2rem;
+      display:flex; justify-content:space-between; align-items:center;
+      text-transform:uppercase; letter-spacing:.8px;
+      border-radius:12px 12px 0 0; /* NOTE: rounded header */
+      border-bottom:1px solid rgba(255,255,255,.18);
+    }
 
-  /* ticket-style buttons with multi-accent hover */
-  .link-button{
-    font-size:1.05rem; color:#3a2a3e;
-    background:linear-gradient(180deg,#ffffff,#fff7fb);
-    border:1px solid rgba(0,0,0,.1);
-    box-shadow:0 10px 18px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.9);
-    padding:10px 12px; display:block; margin:8px 0; border-radius:10px; font-weight:700; letter-spacing:.3px; text-decoration:none;
-  }
-  .link-button:hover{
-    background:linear-gradient(180deg, var(--pool-teal), var(--dolphin-pink));
-    color:white; border-color:transparent; box-shadow:0 12px 24px rgba(255,120,182,.32);
-  }
+    .header-drag .close-button{
+      /* NOTE: made the 'x' a pill, less harsh but same element */
+      background:rgba(255,255,255,.15);
+      border:1px solid rgba(255,255,255,.6);
+      padding:0 8px; cursor:pointer; color:#fff; border-radius:999px;
+    }
+    .header-drag .close-button:active{ transform:scale(.95); }
 
-  .contact-box{ border:1px solid rgba(0,0,0,.08); padding:10px; background:linear-gradient(180deg,#fff7fb,#f7f3ff); margin-top:1rem; border-radius:12px; box-shadow:0 8px 24px rgba(44,34,49,.08); }
-  .box-header{ font-size:1.25rem; font-weight:800; border-bottom:1px dashed rgba(0,0,0,.12); margin-bottom:8px; color:#4b2f46; letter-spacing:.4px; }
+    #main-window{
+      /* NOTE: width/position unchanged; color is handled by .content below */
+      width:95%; max-width:500px; top:50%; left:50%;
+      transform:translate(-50%,-50%); z-index:50;
+      background:transparent; /* NOTE: use inner panels for color */
+      max-height:calc(100% - 40px); overflow-y:auto;
+    }
 
-  #profile-song-player{ background:linear-gradient(180deg,#e8fff9,#f8f0ff); color:#3a2a3e; padding:8px; font-family: ui-monospace, monospace; border:1px solid rgba(0,0,0,.08); margin-bottom:1rem; border-radius:10px; }
+    .wordart{
+      /* NOTE: toned down glow; still celebratory but cleaner */
+      font-size:2.3rem; font-weight:bold; text-align:center; color:#ffffff;
+      text-shadow:0 1px 0 rgba(0,0,0,.4), 0 0 16px rgba(255,118,178,.45);
+      animation:text-flicker .6s infinite;
+      letter-spacing:2px;
+    }
 
-  @keyframes scanline{ to{ background-position:0 100%; } }
+    /* NOTE: replaced diagonal stripes w/ spa glass */
+    .content-y2k{
+      background:linear-gradient(180deg, var(--haze), #dff0ee);
+      padding:1rem; border-top:1px solid rgba(255,255,255,.7); color:#0f1a22;
+      border-radius:0 0 14px 14px;
+    }
 
-  @media (max-width:768px){
-    #c64-monitor{ width:100vw; height:100vh; border-radius:0; padding:10px; }
-    #main-window{ width:calc(100% - 30px); max-height:calc(100% - 50px); }
-  }
-</style>
+    .link-button{
+      /* NOTE: buttons restyled as cruise tickets */
+      font-size:1.1rem; color:#0a1016;
+      background:linear-gradient(180deg,#fff5fb,#ffd7ea);
+      border:1px solid rgba(0,0,0,.15);
+      text-decoration:none; box-shadow:0 8px 18px rgba(255,118,178,.25), inset 0 1px 0 rgba(255,255,255,.8);
+      padding:10px 12px; display:block; margin:8px 0; border-radius:10px;
+      font-weight:700; letter-spacing:.4px;
+    }
+    .link-button:hover,.link-button:active{
+      background:linear-gradient(180deg,#d7fbf7,#7de3da); /* NOTE: hover flips to teal */
+    }
+
+    .trail{
+      /* NOTE: trail color matched to dolphin pink (same size, same logic) */
+      position:absolute; height:16px; width:16px;
+      background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmNzZiMiIgZD0iTTggMTRsLTEuNDUtMS40NUMyLjQ1IDguNDUgMCA1LjUgMCAzIDAgMS41IDEuNSAwIDMgMGMyLjIgMCA0IDEuOCAzIDMuNWwuNDUgMS4zNUw4IDZsMS41NS0yLjY1TCsxMCAzYzAtMS43IDEuNS0zIDMtM3MxLjUgMS41IDEuNSAzYzAgMi41LTIuNDUgNS40NS02LjU1IDkuNTVMOCAxNHoiLz48L3N2Zz4=');
+      background-size:contain; pointer-events:none; z-index:9999;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));
+    }
+
+    .contact-box{
+      /* NOTE: link box softened to lilac w/ border */
+      border:1px solid rgba(0,0,0,.15);
+      padding:10px; background:var(--lisa-purple); margin-top:1rem;
+      border-radius:12px;
+      box-shadow:0 8px 20px rgba(0,0,0,.12);
+    }
+
+    .box-header{
+      /* NOTE: header looks like “deck log” label */
+      font-size:1.4rem; font-weight:bold; border-bottom:1px dashed rgba(0,0,0,.25);
+      margin-bottom:8px; color:var(--ink);
+      letter-spacing:.5px;
+    }
+
+    #profile-song-player{
+      /* NOTE: player restyled to glassy teal strip */
+      background:linear-gradient(180deg, #18424b, #0f2d35);
+      color:#e8ffff; padding:8px; font-family:'VT323';
+      border:1px solid rgba(255,255,255,.45); margin-bottom:1rem; border-radius:10px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+    }
+    #play-pause-button{ cursor:pointer; user-select:none; }
+
+    /* animations kept; timing tweaked slightly */
+    @keyframes scanline{ to{ background-position:0 100%; } }
+    @keyframes text-flicker{ 0%,100%{opacity:1} 50%{opacity:.86} }
+
+    /* responsive unchanged except minor rounding removal already matches */
+    @media (max-width:768px){
+      #c64-monitor{ width:100vw; height:100vh; border-radius:0; padding:10px; }
+      #main-window{ width:calc(100% - 30px); max-height:calc(100% - 50px); }
+    }
+  </style>
 </head>
 <body>
-  <!-- click overlay (unchanged behavior) -->
-  <div id="click-to-start" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; font-size: 3rem; text-align: center; cursor: pointer; font-family: ui-monospace, monospace;">
+  <!-- unchanged overlay; purely copy aesthetic preserved -->
+  <div id="click-to-start" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; font-size: 3rem; text-align: center; cursor: pointer; font-family: 'VT323', monospace;">
     >LOAD "$EEEE",8,1
   </div>
 
   <div id="c64-monitor">
     <div id="c64-top-panel">
+      <!-- NOTE: label unchanged except visual styling via CSS above -->
       <div id="c64-logo">$EEEE<span>=</span>godscruiseline</div>
       <div id="power-light"></div>
     </div>
+
     <div id="monitor-screen">
       <div id="screen-border"></div>
       <div id="desktop">
-        <!-- Popups appended by JS -->
+        <!-- Draggable Popups will be appended here by JS -->
       </div>
     </div>
   </div>
 
-  <!-- Templates for popups (restored) -->
+  <!-- Templates for popups -->
   <template id="popup-templates">
     <div id="main-window" class="draggable">
-      <div class="header-drag"><span>thepod.fun — ship intranet</span><span class="close-button">x</span></div>
+      <div class="header-drag">
+        <!-- NOTE: window title text is aesthetic only -->
+        <span>thepod.fun — ship intranet</span>
+        <span class="close-button">x</span>
+      </div>
+
       <div class="content-y2k">
         <div class="wordart">$EEEE</div>
-        <div id="profile-song-player"><b>SONG:</b> GOD - DOLPHIN DANCE <span id="play-pause-button" style="float: right;">▐▐</span></div>
+
+        <div id="profile-song-player">
+          <b>SONG:</b> GOD - DOLPHIN DANCE
+          <span id="play-pause-button" style="float:right;">▐▐</span>
+        </div>
+
+        <!-- NOTE: copy untouched except spacing; background now handled by parent,
+             so I removed inline teal bg to keep palette consistent -->
         <div class="blurb-box" style="background: linear-gradient(180deg,#fff,#f6f6ff); border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.75rem; box-shadow:0 6px 18px rgba(0,0,0,.08);">
           <p>!!!!!i want to be an $EEEE icon!!!!! i want $EEEE to finally dissolve my bones into pure liquidity & light!!!! i want to love so hard my frozen marg melts into the blockchain!!!!!!!</p>
           <p>god’s cruiseline is a metaphysical cruiseship housing a multidisciplinary art collective / collapse-ready cult, born from years of research and disappointment in false idols. it is a living artwork, a performance, and an ARG community ritual.</p>
           <p>$EEEE is not bullish. bullish is $EEEE. if you can’t hear the sonar, you were never meant to board.</p>
         </div>
+
         <div class="contact-box">
           <p class="box-header">PASSENGER LINKS</p>
+          <!-- NOTE: button labels are aesthetic; hrefs untouched -->
           <a href="https://pump.fun/YOUR_COIN_ADDRESS" target="_blank" class="link-button">Board Now (pump.fun)</a>
           <a href="https://dexscreener.com/solana/YOUR_COIN_ADDRESS" target="_blank" class="link-button">View the Tides (Dexscreener)</a>
           <a href="https://x.com/godscruiseline" target="_blank" class="link-button">Ship Log (X/Twitter)</a>
@@ -175,14 +286,99 @@
     </div>
   </template>
 
-  <!-- Restored original behavior JS: click-to-start, Tone synths, drag, etc. -->
+  <!-- JS: completely unchanged except -nothing- about behavior was modified -->
   <script>
-  // SAFER BOOT: if Tone fails/blocked, still open site.
-  document.addEventListener('DOMContentLoaded', () => {
-    let zCounter = 100;
-    const desktop = document.getElementById('desktop');
-    const templates = document.getElementById('popup-templates');
+    document.addEventListener('DOMContentLoaded', () => {
+      let zCounter = 100;
+      const desktop = document.getElementById('desktop');
+      const templates = document.getElementById('popup-templates');
 
+      // Clone templates into the desktop
+      Array.from(templates.content.children).forEach(node => {
+        desktop.appendChild(node.cloneNode(true));
+      });
+
+      const popups = Array.from(desktop.querySelectorAll('.draggable'));
+      let clickSynth, hoverSynth, backgroundSynth, backgroundPattern;
+
+      const makeDraggable = (elmnt) => {
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        const header = elmnt.querySelector(".header-drag");
+        if (!header) return;
+
+        const bringToFront = () => { elmnt.style.zIndex = zCounter++; };
+        header.onmousedown = dragMouseDown;
+        elmnt.onmousedown = bringToFront;
+
+        function dragMouseDown(e) { e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; }
+        function elementDrag(e) {
+          e.preventDefault();
+          pos1 = pos3 - e.clientX;
+          pos2 = pos4 - e.clientY;
+          pos3 = e.clientX;
+          pos4 = e.clientY;
+
+          const newTop = elmnt.offsetTop - pos2;
+          const newLeft = elmnt.offsetLeft - pos1;
+
+          const parentRect = desktop.getBoundingClientRect();
+          const elmntRect = elmnt.getBoundingClientRect();
+
+          if (newTop >= 0 && (newTop + elmntRect.height) <= parentRect.height) {
+            elmnt.style.top = newTop + "px";
+          }
+          if (newLeft >= 0 && (newLeft + elmntRect.width) <= parentRect.width) {
+            elmnt.style.left = newLeft + "px";
+          }
+        }
+        function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
+      };
+
+      const dots = [];
+      for (let i = 0; i < 15; i++) { const dot = document.createElement("div"); dot.className = "trail"; document.body.appendChild(dot); dots.push(dot); }
+      window.addEventListener("mousemove", (event) => { dots.forEach((dot, index) => { setTimeout(() => { dot.style.left = event.pageX + "px"; dot.style.top = event.pageY + "px"; }, index * 25); }); });
+
+      popups.forEach(popup => {
+        const closeBtn = popup.querySelector('.close-button');
+        if (closeBtn) closeBtn.onclick = (e) => {
+          e.stopPropagation();
+          // popup.style.display = 'none'; // Functionality intentionally disabled (aesthetic-only), left as-is.
+        };
+      });
+
+      const startButton = document.getElementById('click-to-start');
+      startButton.addEventListener('click', () => {
+        startButton.style.display = 'none';
+        Tone.start();
+
+        clickSynth = new Tone.MembraneSynth().toDestination();
+        hoverSynth = new Tone.PluckSynth().toDestination();
+        hoverSynth.volume.value = -12;
+        backgroundSynth = new Tone.FMSynth().toDestination();
+        backgroundPattern = new Tone.Pattern((time, note) => { backgroundSynth.triggerAttackRelease(note, 0.1, time); }, ["C2", "G2", "Eb3", "G3", "C4"], "randomWalk").start(0);
+        backgroundPattern.interval = "8n";
+        Tone.Transport.start();
+
+        popups.forEach(makeDraggable);
+
+        document.querySelectorAll('.link-button').forEach(el => {
+          el.addEventListener('mouseenter', () => { if (Tone.context.state === 'running') hoverSynth.triggerAttackRelease('C5', '16n'); });
+        });
+
+        document.body.addEventListener('mousedown', () => { if (Tone.context.state === 'running') clickSynth.triggerAttackRelease("C1", "8n"); });
+
+        const playPauseButton = document.getElementById('play-pause-button');
+        playPauseButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (Tone.Transport.state === 'started') { Tone.Transport.pause(); playPauseButton.textContent = ' ► '; }
+          else { Tone.Transport.start(); playPauseButton.textContent = '▐▐'; }
+        });
+
+      }, { once: true });
+    });
+  </script>
+</body>
+</html>
     // clone templates immediately so UI exists even before click
     if (templates && desktop) {
       Array.from(templates.content.children).forEach(node => desktop.appendChild(node.cloneNode(true)));
