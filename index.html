@@ -1,40 +1,293 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>God's Cruiseline</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-    <style>
-        /* Y2K Commodore 64 Lisa Frank Dolphin Overload - ENCAPSULATED */
-        :root {
-            --c64-blue: #22181C;
-            --c64-light-blue: #BFD7EA;
-            --c64-bezel: #EAE3D5;
-            --c64-bezel-dark: #C2B8A5;
-            --lisa-pink: #ff77a8;
-            --lisa-yellow: #DBF4A7;
-            --lisa-purple: #7D84B2;
-            --lisa-teal: #5AAA95;
-            --pastel-cyan: #b8f2e6;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>God's Cruiseline</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
 
-        html, body { height: 100%; margin: 0; padding: 0; }
-        body {
-            font-family: 'VT323', monospace;
-            background-color: #000;
-            color: #fff;
-            overflow: hidden;
-            cursor: url('https://cur.cursors-4u.net/symbols/sym-1/sym46.cur'), auto;
-            image-rendering: pixelated;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-size: cover;
+  <style>
+  /* Luxury cruise pastel—balanced pink/lilac/teal/pale‑yellow. Functionality unchanged. */
+  :root{
+    /* Base surfaces */
+    --pearl:#fffdf9;           /* pearl white */
+    --shell:#faf4f2;           /* soft shell */
+    --mist:#f4f1fb;            /* lilac mist */
+    --ink:#2c2231;             /* refined plum text */
+
+    /* Accents */
+    --dolphin-pink:#ff78b6;    /* pink */
+    --lilac:#c7b5ff;           /* purple */
+    --pool-teal:#6fe3d6;       /* teal */
+    --pale-yellow:#ffe8a3;     /* champagne yellow */
+
+    /* Legacy variable mapping to keep rest of layout intact */
+    --c64-blue: var(--mist);
+    --c64-light-blue:#e8defc;
+    --c64-bezel: var(--shell);
+    --c64-bezel-dark: var(--pearl);
+
+    --lisa-pink: var(--dolphin-pink);
+    --lisa-yellow: var(--pale-yellow);
+    --lisa-purple: var(--lilac);
+    --lisa-teal: var(--pool-teal);
+    --pastel-cyan: var(--mist);
+  }
+
+  html, body { height:100%; margin:0; padding:0; }
+  body{
+    font-family: ui-monospace, monospace;
+    /* Lighter, more refined background */
+    background:
+      radial-gradient(900px 600px at 70% -10%, #fffaf2 0%, #fbf5ff 55%, #f7fffd 100%),
+      linear-gradient(180deg, var(--pearl), var(--shell));
+    color:var(--ink);
+    overflow:hidden;
+    display:flex; justify-content:center; align-items:center;
+  }
+
+  /* Bezel/frame — subtle gold shadow for luxury hint */
+  #c64-monitor{
+    width:95vw; height:85vh; max-width:1200px;
+    background:linear-gradient(135deg, var(--c64-bezel), var(--c64-bezel-dark));
+    border:2px solid rgba(0,0,0,.06);
+    border-radius:22px;
+    box-shadow:0 24px 80px rgba(214,198,168,.35), inset 4px 4px 18px rgba(255,255,255,.7);
+    padding:25px; display:flex; flex-direction:column; position:relative;
+  }
+
+  #c64-top-panel{ display:flex; justify-content:space-between; align-items:center; padding:0 10px 15px 10px; }
+  #c64-logo{ font-family: Georgia, serif; font-weight:700; font-size:1.2rem; color:#5a3a55; letter-spacing:.4px; }
+  #c64-logo span{
+    /* Pearlescent wordmark */
+    background:linear-gradient(90deg, var(--dolphin-pink), var(--lilac), var(--pool-teal), var(--pale-yellow));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  }
+
+  #power-light{ width:12px; height:12px; background:var(--dolphin-pink); border:1px solid #cc4d8f; border-radius:50%; box-shadow:0 0 8px var(--dolphin-pink); }
+
+  #monitor-screen{
+    flex-grow:1;
+    background:linear-gradient(180deg, var(--mist), var(--pearl));
+    border:2px solid rgba(0,0,0,.06);
+    box-shadow:inset 0 0 18px rgba(139, 92, 246, .18); /* lilac inner glow */
+    position:relative; overflow:hidden;
+  }
+
+  #screen-border{ position:absolute; inset:0; border:20px solid rgba(111,227,214,.25); box-sizing:border-box; pointer-events:none; z-index:1; }
+  #desktop{ width:100%; height:100%; position:relative; z-index:2; }
+
+  /* softer scanline */
+  #desktop::after{ content:""; position:absolute; inset:0; background:linear-gradient(rgba(255,255,255,.12) 50%, rgba(0,0,0,.04) 50%); background-size:100% 4px; opacity:.18; pointer-events:none; z-index:3; }
+
+  .draggable{
+    position:absolute; background:rgba(255,255,255,.66);
+    border:1px solid rgba(0,0,0,.08);
+    border-radius:14px; box-shadow:0 12px 28px rgba(44,34,49,.08);
+    backdrop-filter: blur(6px) saturate(1.03);
+  }
+
+  .header-drag{
+    padding:6px 10px; cursor:move; z-index:10;
+    background:linear-gradient(180deg, #f9d2e8, #e3d6ff 70%);
+    color:#4b2f46; font-size:1.1rem; display:flex; justify-content:space-between; align-items:center; border-radius:12px 12px 0 0;
+    border-bottom:1px solid rgba(0,0,0,.06); letter-spacing:.6px; text-transform:uppercase;
+  }
+  .header-drag .close-button{ background:#ffe8f5; border:1px solid rgba(0,0,0,.1); padding:0 8px; cursor:pointer; color:#5a3a55; border-radius:999px; }
+
+  .wordart{
+    font-size:2.3rem; font-weight:700; text-align:center; color:#5a3a55;
+    text-shadow:0 1px 0 rgba(255,255,255,.8), 0 0 14px rgba(199,181,255,.45);
+    letter-spacing:2px;
+  }
+
+  .content-y2k{
+    background:linear-gradient(180deg, #ffffff, #fff8f2);
+    padding:1rem; border-radius:0 0 14px 14px; color:var(--ink);
+  }
+
+  /* ticket-style buttons with multi-accent hover */
+  .link-button{
+    font-size:1.05rem; color:#3a2a3e;
+    background:linear-gradient(180deg,#ffffff,#fff7fb);
+    border:1px solid rgba(0,0,0,.1);
+    box-shadow:0 10px 18px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.9);
+    padding:10px 12px; display:block; margin:8px 0; border-radius:10px; font-weight:700; letter-spacing:.3px; text-decoration:none;
+  }
+  .link-button:hover{
+    background:linear-gradient(180deg, var(--pool-teal), var(--dolphin-pink));
+    color:white; border-color:transparent; box-shadow:0 12px 24px rgba(255,120,182,.32);
+  }
+
+  .contact-box{ border:1px solid rgba(0,0,0,.08); padding:10px; background:linear-gradient(180deg,#fff7fb,#f7f3ff); margin-top:1rem; border-radius:12px; box-shadow:0 8px 24px rgba(44,34,49,.08); }
+  .box-header{ font-size:1.25rem; font-weight:800; border-bottom:1px dashed rgba(0,0,0,.12); margin-bottom:8px; color:#4b2f46; letter-spacing:.4px; }
+
+  #profile-song-player{ background:linear-gradient(180deg,#e8fff9,#f8f0ff); color:#3a2a3e; padding:8px; font-family: ui-monospace, monospace; border:1px solid rgba(0,0,0,.08); margin-bottom:1rem; border-radius:10px; }
+
+  @keyframes scanline{ to{ background-position:0 100%; } }
+
+  @media (max-width:768px){
+    #c64-monitor{ width:100vw; height:100vh; border-radius:0; padding:10px; }
+    #main-window{ width:calc(100% - 30px); max-height:calc(100% - 50px); }
+  }
+</style>
+</head>
+<body>
+  <!-- click overlay (unchanged behavior) -->
+  <div id="click-to-start" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; font-size: 3rem; text-align: center; cursor: pointer; font-family: ui-monospace, monospace;">
+    >LOAD "$EEEE",8,1
+  </div>
+
+  <div id="c64-monitor">
+    <div id="c64-top-panel">
+      <div id="c64-logo">$EEEE<span>=</span>godscruiseline</div>
+      <div id="power-light"></div>
+    </div>
+    <div id="monitor-screen">
+      <div id="screen-border"></div>
+      <div id="desktop">
+        <!-- Popups appended by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates for popups (restored) -->
+  <template id="popup-templates">
+    <div id="main-window" class="draggable">
+      <div class="header-drag"><span>thepod.fun — ship intranet</span><span class="close-button">x</span></div>
+      <div class="content-y2k">
+        <div class="wordart">$EEEE</div>
+        <div id="profile-song-player"><b>SONG:</b> GOD - DOLPHIN DANCE <span id="play-pause-button" style="float: right;">▐▐</span></div>
+        <div class="blurb-box" style="background: linear-gradient(180deg,#fff,#f6f6ff); border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.75rem; box-shadow:0 6px 18px rgba(0,0,0,.08);">
+          <p>!!!!!i want to be an $EEEE icon!!!!! i want $EEEE to finally dissolve my bones into pure liquidity & light!!!! i want to love so hard my frozen marg melts into the blockchain!!!!!!!</p>
+          <p>god’s cruiseline is a metaphysical cruiseship housing a multidisciplinary art collective / collapse-ready cult, born from years of research and disappointment in false idols. it is a living artwork, a performance, and an ARG community ritual.</p>
+          <p>$EEEE is not bullish. bullish is $EEEE. if you can’t hear the sonar, you were never meant to board.</p>
+        </div>
+        <div class="contact-box">
+          <p class="box-header">PASSENGER LINKS</p>
+          <a href="https://pump.fun/YOUR_COIN_ADDRESS" target="_blank" class="link-button">Board Now (pump.fun)</a>
+          <a href="https://dexscreener.com/solana/YOUR_COIN_ADDRESS" target="_blank" class="link-button">View the Tides (Dexscreener)</a>
+          <a href="https://x.com/godscruiseline" target="_blank" class="link-button">Ship Log (X/Twitter)</a>
+          <a href="https://t.me/heavenlyshores" target="_blank" class="link-button">Boarding Gate (Telegram)</a>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Restored original behavior JS: click-to-start, Tone synths, drag, etc. -->
+  <script>
+  // SAFER BOOT: if Tone fails/blocked, still open site.
+  document.addEventListener('DOMContentLoaded', () => {
+    let zCounter = 100;
+    const desktop = document.getElementById('desktop');
+    const templates = document.getElementById('popup-templates');
+
+    // clone templates immediately so UI exists even before click
+    if (templates && desktop) {
+      Array.from(templates.content.children).forEach(node => desktop.appendChild(node.cloneNode(true)));
+    }
+
+    const popups = Array.from(desktop.querySelectorAll('.draggable'));
+
+    const makeDraggable = (elmnt) => {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      const header = elmnt.querySelector('.header-drag'); if (!header) return;
+      const bringToFront = () => { elmnt.style.zIndex = zCounter++; };
+      header.onmousedown = dragMouseDown; elmnt.onmousedown = bringToFront;
+      function dragMouseDown(e){ e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; }
+      function elementDrag(e){ e.preventDefault(); pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY; const newTop = elmnt.offsetTop - pos2; const newLeft = elmnt.offsetLeft - pos1; const parentRect = desktop.getBoundingClientRect(); const r = elmnt.getBoundingClientRect(); if (newTop >= 0 && (newTop + r.height) <= parentRect.height) elmnt.style.top = newTop + 'px'; if (newLeft >= 0 && (newLeft + r.width) <= parentRect.width) elmnt.style.left = newLeft + 'px'; }
+      function closeDragElement(){ document.onmouseup = null; document.onmousemove = null; }
+    };
+
+    // sparkle trail (unchanged)
+    const dots = []; for (let i=0;i<15;i++){ const d=document.createElement('div'); d.className='trail'; document.body.appendChild(d); dots.push(d); }
+    window.addEventListener('mousemove', (event) => { dots.forEach((dot, i) => { setTimeout(() => { dot.style.left = event.pageX + 'px'; dot.style.top = event.pageY + 'px'; }, i * 25); }); });
+
+    popups.forEach(p => { const c = p.querySelector('.close-button'); if (c) c.onclick = (e) => { e.stopPropagation(); /* visual-only */ }; });
+
+    const bootUI = () => { popups.forEach(makeDraggable); };
+
+    const startButton = document.getElementById('click-to-start');
+    const safeStart = () => {
+      // always hide overlay so UI is usable even if audio fails
+      if (startButton) startButton.style.display = 'none';
+
+      // try audio init; if Tone missing or blocked, continue silently
+      try {
+        if (window.Tone) {
+          Tone.start();
+          const clickSynth = new Tone.MembraneSynth().toDestination();
+          const hoverSynth = new Tone.PluckSynth().toDestination();
+          hoverSynth.volume.value = -12;
+          const backgroundSynth = new Tone.FMSynth().toDestination();
+          const pattern = new Tone.Pattern((time, note) => { backgroundSynth.triggerAttackRelease(note, 0.1, time); }, ['C2','G2','Eb3','G3','C4'], 'randomWalk').start(0);
+          pattern.interval = '8n';
+          Tone.Transport.start();
+          document.querySelectorAll('.link-button').forEach(el => el.addEventListener('mouseenter', () => { if (Tone.context.state === 'running') hoverSynth.triggerAttackRelease('C5','16n'); }));
+          document.body.addEventListener('mousedown', () => { if (Tone.context.state === 'running') clickSynth.triggerAttackRelease('C1','8n'); });
+          const playPauseButton = document.getElementById('play-pause-button');
+          if (playPauseButton) playPauseButton.addEventListener('click', (e) => { e.stopPropagation(); if (Tone.Transport.state === 'started'){ Tone.Transport.pause(); playPauseButton.textContent = ' ► '; } else { Tone.Transport.start(); playPauseButton.textContent = '▐▐'; } });
+        }
+      } catch (err) { /* silent fail; UI still loads */ }
+
+      bootUI();
+    };
+
+    if (startButton) startButton.addEventListener('click', safeStart, { once:true });
+  });
+</script>
+  
+  <!-- SAFER BOOT SCRIPT appended: opens even if Tone fails -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const desktop = document.getElementById('desktop');
+      const templates = document.getElementById('popup-templates');
+      if (templates && desktop && desktop.children.length === 0) {
+        Array.from(templates.content.children).forEach(n => desktop.appendChild(n.cloneNode(true)));
+      }
+
+      let zCounter = 100;
+      const popups = Array.from(document.querySelectorAll('.draggable'));
+      const makeDraggable = (elmnt) => {
+        let pos1=0,pos2=0,pos3=0,pos4=0; const h=elmnt.querySelector('.header-drag'); if(!h) return;
+        const bringToFront=()=>{ elmnt.style.zIndex = zCounter++; };
+        h.onmousedown=dragMouseDown; elmnt.onmousedown=bringToFront;
+        function dragMouseDown(e){ e.preventDefault(); pos3=e.clientX; pos4=e.clientY; document.onmouseup=closeDragElement; document.onmousemove=elementDrag; }
+        function elementDrag(e){ e.preventDefault(); pos1=pos3-e.clientX; pos2=pos4-e.clientY; pos3=e.clientX; pos4=e.clientY; const nt=elmnt.offsetTop-pos2; const nl=elmnt.offsetLeft-pos1; const pr=desktop.getBoundingClientRect(); const r=elmnt.getBoundingClientRect(); if(nt>=0 && nt+r.height<=pr.height) elmnt.style.top=nt+'px'; if(nl>=0 && nl+r.width<=pr.width) elmnt.style.left=nl+'px'; }
+        function closeDragElement(){ document.onmouseup=null; document.onmousemove=null; }
+      };
+
+      // sparkle trail (unchanged)
+      const dots=[]; for(let i=0;i<15;i++){ const d=document.createElement('div'); d.className='trail'; document.body.appendChild(d); dots.push(d); }
+      window.addEventListener('mousemove', (ev)=>{ dots.forEach((dot,i)=>{ setTimeout(()=>{ dot.style.left=ev.pageX+'px'; dot.style.top=ev.pageY+'px'; }, i*25); }); });
+
+      popups.forEach(p=>{ const c=p.querySelector('.close-button'); if(c) c.onclick=(e)=>{ e.stopPropagation(); }; });
+
+      const startButton=document.getElementById('click-to-start');
+      const safeStart=()=>{
+        if(startButton) startButton.style.display='none';
+        // try audio; ignore failures
+        try{
+          if(window.Tone){
+            Tone.start();
+            const clickSynth=new Tone.MembraneSynth().toDestination();
+            const hoverSynth=new Tone.PluckSynth().toDestination(); hoverSynth.volume.value=-12;
+            const backgroundSynth=new Tone.FMSynth().toDestination();
+            const pattern=new Tone.Pattern((t,n)=>{ backgroundSynth.triggerAttackRelease(n,0.1,t); }, ['C2','G2','Eb3','G3','C4'],'randomWalk').start(0);
+            pattern.interval='8n'; Tone.Transport.start();
+            document.querySelectorAll('.link-button').forEach(el=>el.addEventListener('mouseenter',()=>{ if(Tone.context.state==='running') hoverSynth.triggerAttackRelease('C5','16n'); }));
+            document.body.addEventListener('mousedown',()=>{ if(Tone.context.state==='running') clickSynth.triggerAttackRelease('C1','8n'); });
+            const pp=document.getElementById('play-pause-button'); if(pp) pp.addEventListener('click',(e)=>{ e.stopPropagation(); if(Tone.Transport.state==='started'){ Tone.Transport.pause(); pp.textContent=' ► '; } else { Tone.Transport.start(); pp.textContent='▐▐'; } });
+          }
+        }catch(_){/* silent */}
+        popups.forEach(makeDraggable);
+      };
+      if(startButton) startButton.addEventListener('click', safeStart, {once:true});
+    });
+  </script>
+</body>
+</html>            background-size: cover;
         }
         
         #c64-monitor {
