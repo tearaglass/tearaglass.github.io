@@ -199,6 +199,11 @@
             <div class="header-drag"><span>thepod.fun</span><span class="close-button">x</span></div>
             <div class="content-y2k">
                 <div class="wordart">$EEEE</div>
+                <div class="wordart">$EEEE</div>
+                <div id="contract-box" style="text-align:center; font-size:0.9rem; color:grey; margin-top:4px; cursor:pointer;">
+                        DBR354W1tooFKq9GAMV8husETxMK2eoe6iXHbwTvpump 
+                <span style="margin-left:6px;">📋</span>
+                </div>
                 <div id="profile-song-player"><b>SONG:</b> GODVOICE - DOLPHIN DANCE <span id="play-pause-button" style="float: right;">▐▐</span></div>
                 
                 <div class="blurb-box" style="background: var(--lisa-teal);">
@@ -220,7 +225,17 @@
             let zCounter = 100;
             const desktop = document.getElementById('desktop');
             const templates = document.getElementById('popup-templates');
-            
+
+            const contractBox = document.getElementById("contract-box");
+            if (contractBox) {
+        contractBox.addEventListener("click", () => {
+            const addr = "DBR354W1tooFKq9GAMV8husETxMK2eoe6iXHbwTvpump";
+        navigator.clipboard.writeText(addr).then(() => {
+        contractBox.style.color = "lightgreen";
+            setTimeout(() => contractBox.style.color = "grey", 1000);
+                            });
+                                });
+                                }
             // Clone templates into the desktop
             Array.from(templates.content.children).forEach(node => {
                 desktop.appendChild(node.cloneNode(true));
