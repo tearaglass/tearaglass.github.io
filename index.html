@@ -1,315 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>God's Cruiseline</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-    <style>
-        /* Y2K Commodore 64 Lisa Frank Dolphin Overload - ENCAPSULATED */
-        :root {
-            --c64-blue: #22181C;
-            --c64-light-blue: #BFD7EA;
-            --c64-bezel: #EAE3D5;
-            --c64-bezel-dark: #C2B8A5;
-            --lisa-pink: #ff77a8;
-            --lisa-yellow: #DBF4A7;
-            --lisa-purple: #7D84B2;
-            --lisa-teal: #5AAA95;
-            --pastel-cyan: #b8f2e6;
-        }
-
-        html, body { height: 100%; margin: 0; padding: 0; }
-        body {
-            font-family: 'VT323', monospace;
-            background-color: #000;
-            color: #fff;
-            overflow: hidden;
-            cursor: url('https://cur.cursors-4u.net/nature/nat-10/nat985.cur'), auto;
-            image-rendering: pixelated;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-size: cover;
-        }
-        
-        #c64-monitor {
-            width: 95vw;
-            height: 85vh;
-            max-width: 1200px;
-            background: linear-gradient(135deg, var(--c64-bezel), var(--c64-bezel-dark));
-            border: 2px solid #000;
-            border-radius: 20px;
-            box-shadow: 10px 10px 20px rgba(0,0,0,0.7), inset 5px 5px 15px rgba(255,255,255,0.3);
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        #c64-top-panel {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 10px 15px 10px;
-        }
-
-        #c64-logo {
-            font-family: sans-serif;
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: #4a3e31;
-        }
-        #c64-logo span {
-             background: linear-gradient(to right, #d40000, #ff8000, #ffff00, #00ff00, #0000ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        #power-light {
-            width: 12px;
-            height: 12px;
-            background: #ff0000;
-            border: 1px solid #8B0000;
-            border-radius: 50%;
-            box-shadow: 0 0 5px #ff0000;
-        }
-
-        #monitor-screen {
-            flex-grow: 1;
-            background: var(--c64-blue);
-            border: 2px solid #000;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-            position: relative;
-            overflow: hidden;
-        }
-
-        #screen-border {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            border: 20px solid var(--c64-light-blue);
-            box-sizing: border-box;
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        #desktop {
-            width: 100%; height: 100%;
-            background-size: cover;
-            position: relative;
-            z-index: 2;
-        }
-
-        #desktop::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-            background-size: 100% 4px;
-            opacity: 0.3;
-            pointer-events: none;
-            z-index: 3;
-            animation: scanline 10s linear infinite;
-        }
-
-        .draggable {
-            position: absolute;
-            background: var(--c64-light-blue);
-            border: 2px solid #fff;
-            box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
-            will-change: transform;
-        }
-
-        .header-drag {
-            padding: 3px 5px;
-            cursor: move;
-            z-index: 10;
-            background: var(--c64-blue);
-            color: #fff;
-            text-align: left;
-            font-size: 1.2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            text-transform: uppercase;
-        }
-        
-        .header-drag .close-button { background: var(--c64-light-blue); border: 2px solid #fff; padding: 0 5px; cursor: pointer; color: #fff; }
-        .header-drag .close-button:active { transform: scale(0.9); }
-
-        #main-window { 
-            width: 95%; 
-            max-width: 500px; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            z-index: 50; 
-            background: var(--pastel-cyan);
-            max-height: calc(100% - 40px);
-            overflow-y: auto;
-        }
-        
-        .wordart { font-size: 2.5rem; font-weight: bold; text-align: center; color: #fff; text-shadow: 2px 2px 0 var(--lisa-pink), -2px -2px 0 var(--lisa-pink), 2px -2px 0 var(--lisa-pink), -2px 2px 0 var(--lisa-pink), 0 0 20px #FBFF12; animation: text-flicker 0.5s infinite; }
-        .content-y2k { background: repeating-linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.2) 10px, rgba(255,255,255,0.2) 20px), var(--pastel-cyan); padding: 1rem; border-top: 2px solid #fff; color: #000; }
-        .link-button { font-size: 1.1rem; color: #000; background: var(--lisa-yellow); border: 2px solid #000; text-decoration: none; box-shadow: 2px 2px 0px #000; padding: 5px 10px; display: block; margin: 5px 0; }
-        .link-button:hover, .link-button:active { background: var(--lisa-pink); }
-        .trail { position: absolute; height: 16px; width: 16px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmNzdhOCIgZD0iTTggMTRsLTEuNDUtMS40NUMyLjQ1IDguNDUgMCA1LjUgMCAzIDAgMS41IDEuNSAwIDMgMGMyLjIgMCA0IDEuOCAzIDMuNWwuNDUgMS4zNUw4IDZsMS41NS0yLjY1TCsxMCAzYzAtMS43IDEuNS0zIDMtM3MxLjUgMS41IDEuNSAzYzAgMi41LTIuNDUgNS40NS02LjU1IDkuNTVMOCAxNHoiLz48L3N2Zz4='); background-size: contain; pointer-events: none; z-index: 9999; }
-        
-        .contact-box { border: 2px solid #000; padding: 10px; background: var(--lisa-teal); margin-top: 1rem; }
-        .box-header { font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #000; margin-bottom: 5px; }
-        #profile-song-player { background: var(--c64-light-blue); color: #fff; padding: 5px; font-family: 'VT323'; border: 2px solid #fff; margin-bottom: 1rem; }
-        #play-pause-button { cursor: pointer; user-select: none; }
-
-        @keyframes scanline { to { background-position: 0 100%; } }
-        @keyframes text-flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
-        
-        @media (max-width: 768px) {
-            #c64-monitor { width: 100vw; height: 100vh; border-radius: 0; padding: 10px; }
-            #main-window { width: calc(100% - 30px); max-height: calc(100% - 50px); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>God's Cruiseline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+  <style>
+    :root {
+      --c64-blue: #22181C;
+      --c64-light-blue: #BFD7EA;
+      --c64-bezel: #EAE3D5;
+      --c64-bezel-dark: #C2B8A5;
+      --lisa-pink: #ff77a8;
+      --lisa-yellow: #DBF4A7;
+      --lisa-purple: #7D84B2;
+      --lisa-teal: #5AAA95;
+      --pastel-cyan: #b8f2e6;
+    }
+    html, body { height:100%; margin:0; padding:0; }
+    body {
+      font-family: 'VT323', monospace;
+      background:#000; color:#fff;
+      display:flex; justify-content:center; align-items:center;
+      overflow:hidden; background-size:cover;
+    }
+    #c64-monitor {
+      width:95vw; height:85vh; max-width:1200px;
+      background:linear-gradient(135deg,var(--c64-bezel),var(--c64-bezel-dark));
+      border:2px solid #000; border-radius:20px;
+      box-shadow:10px 10px 20px rgba(0,0,0,0.7), inset 5px 5px 15px rgba(255,255,255,0.3);
+      padding:25px; display:flex; flex-direction:column; position:relative;
+    }
+    #c64-top-panel{display:flex;justify-content:space-between;align-items:center;padding:0 10px 15px}
+    #c64-logo{font-family:sans-serif;font-weight:bold;font-size:1.2rem;color:#4a3e31}
+    #c64-logo span{background:linear-gradient(to right,#d40000,#ff8000,#ffff00,#00ff00,#0000ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    #power-light{width:12px;height:12px;background:#ff0000;border:1px solid #8B0000;border-radius:50%;box-shadow:0 0 5px #ff0000}
+    #monitor-screen{flex-grow:1;background:var(--c64-blue);border:2px solid #000;box-shadow:inset 0 0 20px rgba(0,0,0,0.8);position:relative;overflow:hidden}
+    #screen-border{position:absolute;top:0;left:0;width:100%;height:100%;border:20px solid var(--c64-light-blue);box-sizing:border-box;pointer-events:none;z-index:1}
+    #desktop{width:100%;height:100%;position:relative;z-index:2}
+    #desktop::after{content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(rgba(18,16,16,0) 50%,rgba(0,0,0,0.25) 50%);background-size:100% 4px;opacity:0.3;pointer-events:none;z-index:3;animation:scanline 10s linear infinite}
+    .draggable{position:absolute;background:var(--c64-light-blue);border:2px solid #fff;box-shadow:5px 5px 0 rgba(0,0,0,0.5)}
+    .header-drag{padding:3px 5px;cursor:move;z-index:10;background:var(--c64-blue);color:#fff;font-size:1.2rem;display:flex;justify-content:space-between;align-items:center;text-transform:uppercase}
+    .header-drag .close-button{background:var(--c64-light-blue);border:2px solid #fff;padding:0 5px;cursor:pointer;color:#fff}
+    #main-window{width:95%;max-width:500px;top:50%;left:50%;transform:translate(-50%,-50%);z-index:50;background:var(--pastel-cyan);max-height:calc(100% - 40px);overflow-y:auto}
+    .wordart{font-size:2.5rem;font-weight:bold;text-align:center;color:#fff;text-shadow:2px 2px 0 var(--lisa-pink),-2px -2px 0 var(--lisa-pink),2px -2px 0 var(--lisa-pink),-2px 2px 0 var(--lisa-pink),0 0 20px #FBFF12;animation:text-flicker 0.5s infinite}
+    .content-y2k{background:repeating-linear-gradient(45deg,rgba(255,255,255,0.1),rgba(255,255,255,0.1) 10px,rgba(255,255,255,0.2) 10px,rgba(255,255,255,0.2) 20px),var(--pastel-cyan);padding:1rem;border-top:2px solid #fff;color:#000}
+    .link-button{font-size:1.1rem;color:#000;background:var(--lisa-yellow);border:2px solid #000;text-decoration:none;box-shadow:2px 2px 0 #000;padding:5px 10px;display:block;margin:5px 0}
+    .link-button:hover{background:var(--lisa-pink)}
+    .contact-box{border:2px solid #000;padding:10px;background:var(--lisa-teal);margin-top:1rem}
+    #profile-song-player{background:var(--c64-light-blue);color:#fff;padding:5px;font-family:'VT323';border:2px solid #fff;margin-bottom:1rem}
+    #play-pause-button{cursor:pointer;user-select:none}
+    @keyframes scanline{to{background-position:0 100%}}
+    @keyframes text-flicker{0%,100%{opacity:1}50%{opacity:0.8}}
+  </style>
 </head>
 <body>
-    <div id="click-to-start" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; font-size: 3rem; text-align: center; cursor: pointer; font-family: 'VT323', monospace;">
-        >LOAD "$EEEE",8,1
+  <div id="click-to-start" style="position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:10000;display:flex;justify-content:center;align-items:center;color:white;font-size:3rem;text-align:center;cursor:pointer;font-family:'VT323',monospace;">
+    >LOAD "$EEEE",8,1
+  </div>
+
+  <div id="c64-monitor">
+    <div id="c64-top-panel">
+      <div id="c64-logo">GODSCRUISELINE<span>=</span>prophetportal</div>
+      <div id="power-light"></div>
     </div>
-    
-    <div id="c64-monitor">
-        <div id="c64-top-panel">
-            <div id="c64-logo">GODSCRUISELINE<span>=</span>prophetportal</div>
-            <div id="power-light"></div>
-        </div>
-        <div id="monitor-screen">
-            <div id="screen-border"></div>
-            <div id="desktop">
-                <!-- Draggable Popups will be appended here by JS -->
-            </div>
-        </div>
+    <div id="monitor-screen">
+      <div id="screen-border"></div>
+      <div id="desktop"></div>
     </div>
+  </div>
 
-    <!-- Templates for popups -->
-    <template id="popup-templates">
-        <div id="main-window" class="draggable">
-            <div class="header-drag"><span>thepod.fun</span><span class="close-button">x</span></div>
-            <div class="content-y2k">
-                <div class="wordart">$EEEE</div>
-                    <div id="contract-box" style="text-align:center; font-size:0.9rem; color:grey; margin-top:4px; cursor:pointer;">
-                    DBR354W1tooFKq9GAMV8husETxMK2eoe6iXHbwTvpump 
-                    <span style="margin-left:6px;">📋</span>
-                    </div>
-                <div id="profile-song-player"><b>SONG:</b> GODVOICE - DOLPHIN DANCE <span id="play-pause-button" style="float: right;">▐▐</span></div>
-                
-                <div class="blurb-box" style="background: var(--lisa-teal);">
-                    <p>!!!!!i want to be an $EEEE icon!!!!!i want $EEEE to finally dissolve my bones into pure liquidity & light!!!! gods cruiseline is a metaphysical cruiseship housing a multidisciplinary art collective/collapse ready cult, born from years of research and disappointment in false idols. it is a living artwork, a spectacle and an ARG-ish experiment in the capabilities of community. yes bro it's literally just a cracked streamer coin cept with more drip and hosted by a girl... problem, brokie ??</p>
-                </div>
-
-                <div class="contact-box" style="background: var(--lisa-purple);">
-                    <a href="https://pump.fun/DBR354W1tooFKq9GAMV8husETxMK2eoe6iXHbwTvpump" target="_blank" class="link-button">PUMP.FUN</a>
-                    <a href="https://dexscreener.com/solana/DBR354W1tooFKq9GAMV8husETxMK2eoe6iXHbwTvpump" target="_blank" class="link-button">DEXSCREENER</a>
-                    <a href="https://x.com/godscruiseline" target="_blank" class="link-button">X (TWITTER)</a>
-                    <a href="https://t.me/heavenlyshores" target="_blank" class="link-button">TELEGRAM</a>
-                </div>
-            </div>
+  <template id="popup-templates">
+    <div id="main-window" class="draggable">
+      <div class="header-drag"><span>thepod.fun</span><span class="close-button">x</span></div>
+      <div class="content-y2k">
+        <div class="wordart">$EEEE</div>
+        <div id="contract-box" style="text-align:center;font-size:0.9rem;color:grey;margin-top:4px;cursor:pointer;">
+          DBR354W1tooFKq9GAMV8husETxMK2eoe6iXHbwTvpump <span style="margin-left:6px;">📋</span>
         </div>
-    </template>
+        <div id="profile-song-player"><b>SONG:</b> GODVOICE - DOLPHIN DANCE <span id="play-pause-button" style="float:right;">▐▐</span></div>
+        <div class="blurb-box" style="background:var(--lisa-teal);">
+          <p>!!!!!i want to be an $EEEE icon!!!!! …</p>
+        </div>
+        <div class="contact-box" style="background:var(--lisa-purple);">
+          <a href="https://pump.fun/DBR354W1tooFKq9GAMV8husETxMK2eoe6iXHbwTvpump" target="_blank" class="link-button">PUMP.FUN</a>
+          <a href="https://dexscreener.com/solana/DBR354W1tooFKq9GAMV8husETxMK2eoe6iXHbwTvpump" target="_blank" class="link-button">DEXSCREENER</a>
+          <a href="https://x.com/godscruiseline" target="_blank" class="link-button">X (TWITTER)</a>
+          <a href="https://t.me/heavenlyshores" target="_blank" class="link-button">TELEGRAM</a>
+        </div>
+      </div>
+    </div>
+  </template>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let zCounter = 100;
-            const desktop = document.getElementById('desktop');
-            const templates = document.getElementById('popup-templates');
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let zCounter = 100;
+      const desktop = document.getElementById('desktop');
+      const templates = document.getElementById('popup-templates');
 
-            const contractBox = document.getElementById("contract-box");
-            if (contractBox) {
-        contractBox.addEventListener("click", () => {
-            const addr = "DBR354W1tooFKq9GAMV8husETxMK2eoe6iXHbwTvpump";
-        navigator.clipboard.writeText(addr).then(() => {
-        contractBox.style.color = "lightgreen";
-            setTimeout(() => contractBox.style.color = "grey", 1000);
-                            });
-                                });
-                                }
-            // Clone templates into the desktop
-            Array.from(templates.content.children).forEach(node => {
-                desktop.appendChild(node.cloneNode(true));
-            });
+      // clone template into desktop
+      Array.from(templates.content.children).forEach(node => {
+        desktop.appendChild(node.cloneNode(true));
+      });
 
-            const popups = Array.from(desktop.querySelectorAll('.draggable'));
-            let clickSynth, hoverSynth, backgroundSynth, backgroundPattern;
-
-            const makeDraggable = (elmnt) => {
-                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-                const header = elmnt.querySelector(".header-drag");
-                if (!header) return;
-
-                const bringToFront = () => { elmnt.style.zIndex = zCounter++; };
-                header.onmousedown = dragMouseDown;
-                elmnt.onmousedown = bringToFront;
-
-                function dragMouseDown(e) { e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; }
-                function elementDrag(e) {
-                    e.preventDefault();
-                    pos1 = pos3 - e.clientX;
-                    pos2 = pos4 - e.clientY;
-                    pos3 = e.clientX;
-                    pos4 = e.clientY;
-                    
-                    const newTop = elmnt.offsetTop - pos2;
-                    const newLeft = elmnt.offsetLeft - pos1;
-
-                    const parentRect = desktop.getBoundingClientRect();
-                    const elmntRect = elmnt.getBoundingClientRect();
-                    
-                    if (newTop >= 0 && (newTop + elmntRect.height) <= parentRect.height) {
-                        elmnt.style.top = newTop + "px";
-                    }
-                    if (newLeft >= 0 && (newLeft + elmntRect.width) <= parentRect.width) {
-                        elmnt.style.left = newLeft + "px";
-                    }
-                }
-                function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
-            };
-
-            const dots = [];
-            for (let i = 0; i < 15; i++) { const dot = document.createElement("div"); dot.className = "trail"; document.body.appendChild(dot); dots.push(dot); }
-            window.addEventListener("mousemove", (event) => { dots.forEach((dot, index) => { setTimeout(() => { dot.style.left = event.pageX + "px"; dot.style.top = event.pageY + "px"; }, index * 25); }); });
-            
-            popups.forEach(popup => {
-                const closeBtn = popup.querySelector('.close-button');
-                if(closeBtn) closeBtn.onclick = (e) => { 
-                    e.stopPropagation(); 
-                    // popup.style.display = 'none'; // Functionality removed for aesthetic purposes
-                };
-            });
-
-            const startButton = document.getElementById('click-to-start');
-            startButton.addEventListener('click', () => {
-                startButton.style.display = 'none';
-                Tone.start();
-
-                popups.forEach(makeDraggable);
-                
-                document.querySelectorAll('.link-button').forEach(el => {
-                    el.addEventListener('mouseenter', () => { if(Tone.context.state === 'running') hoverSynth.triggerAttackRelease('C5', '16n'); });
-                });
-                
-                document.body.addEventListener('mousedown', () => { if(Tone.context.state === 'running') clickSynth.triggerAttackRelease("C1", "8n"); });
-                
-                const playPauseButton = document.getElementById('play-pause-button');
-                playPauseButton.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (Tone.Transport.state === 'started') { Tone.Transport.pause(); playPauseButton.textContent = ' ► '; } 
-                    else { Tone.Transport.start(); playPauseButton.textContent = '▐▐'; }
-                });
-
-            }, { once: true });
+      // copy-to-clipboard handler
+      const contractBox = desktop.querySelector('#contract-box');
+      if (contractBox) {
+        contractBox.addEventListener('click', () => {
+          const addr = "DBR354W1tooFKq9GAMV8husETxMK2eoe6iXHbwTvpump";
+          const onSuccess = () => {
+            contractBox.style.color = "lightgreen";
+            setTimeout(() => (contractBox.style.color = "grey"), 900);
+          };
+          const fallback = () => {
+            const ta = document.createElement('textarea');
+            ta.value = addr;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); onSuccess(); }
+            finally { document.body.removeChild(ta); }
+          };
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(addr).then(onSuccess).catch(fallback);
+          } else {
+            fallback();
+          }
         });
-    </script>
+      }
+
+      const popups = Array.from(desktop.querySelectorAll('.draggable'));
+      const makeDraggable = (elmnt) => {
+        let pos1=0,pos2=0,pos3=0,pos4=0;
+        const header = elmnt.querySelector(".header-drag");
+        if (!header) return;
+        const bringToFront = () => { elmnt.style.zIndex = zCounter++; };
+        header.onmousedown = dragMouseDown;
+        elmnt.onmousedown = bringToFront;
+        function dragMouseDown(e){e.preventDefault();pos3=e.clientX;pos4=e.clientY;document.onmouseup=closeDragElement;document.onmousemove=elementDrag;}
+        function elementDrag(e){e.preventDefault();pos1=pos3-e.clientX;pos2=pos4-e.clientY;pos3=e.clientX;pos4=e.clientY;elmnt.style.top=(elmnt.offsetTop-pos2)+"px";elmnt.style.left=(elmnt.offsetLeft-pos1)+"px";}
+        function closeDragElement(){document.onmouseup=null;document.onmousemove=null;}
+      };
+
+      popups.forEach(makeDraggable);
+
+      const startButton = document.getElementById('click-to-start');
+      startButton.addEventListener('click', () => {
+        startButton.style.display = 'none';
+        Tone.start();
+      }, {once:true});
+    });
+  </script>
 </body>
 </html>
